@@ -10,12 +10,16 @@
 #include <arpa/inet.h> //-> for inet_ntoa()
 #include <poll.h> //-> for poll()
 #include <csignal> //-> for signal()
+#include "../Server/Server.hpp"
 
 class Client
 {
 private:
-
+	int	fd;
 public:
 	Client();
 	~Client();
+
+	int	getFd();
+	void	setFd(int n);
 };

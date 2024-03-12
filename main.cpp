@@ -17,5 +17,17 @@ int	main(int argc, char **argv)
 		std::cerr << "Error: Syntax must be ./ircserv <port> <password>";
 		return (0);
 	}
+
+	Server	serv;
+	try
+	{
+		signal(SIGINT, Server::signalHandler);
+		signal(SIGQUIT, Server::signalHandler);
+	}
+	catch(const std::exception& e)
+	{
+		serv.closeFd();
+		std::cerr << e.what() << std::endl;
+	}
 	return (0);
 }
