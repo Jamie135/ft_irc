@@ -3,9 +3,9 @@ CPP = c++
 CFLAGS = -Wall -Wextra -Werror
 CPPFLAGS = -std=c++98
 
-SRCS =	
-
-INCLS = 
+SRCS =	main.cpp \
+		Server/Server.cpp \
+		Client/Client.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -14,7 +14,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CPP) $(VFLAGS) -o $(NAME) $^
 
-%.o : %.cpp $(INCLS)
+%.o : %.cpp
 	$(CPP) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
