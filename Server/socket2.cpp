@@ -2,9 +2,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include "Server.hpp"
 
-int init_socket( int &sockfd, struct sockaddr_in *addr )
+int Server::initSocket()
 {
+    struct sockaddr_in addr;
+    
     if (sockfd != 0)
     {
         std::cout << "Error: init_socket(): parameter not initialized." << std::endl;
@@ -19,8 +22,8 @@ int init_socket( int &sockfd, struct sockaddr_in *addr )
     }
     std::cout << "Socket == " << sockfd << std::endl;
 
-	(*addr).sin_family = AF_INET;
-	(*addr).sin_port = htons(PORT);
+	(addr).sin_family = AF_INET;
+	(addr).sin_port = htons(port);
 
     int opt_val = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val)) == -1)
@@ -33,7 +36,7 @@ int init_socket( int &sockfd, struct sockaddr_in *addr )
         std::cout << "Error: init_socket(): fcntl() failed." << std::endl;
         return (1);
     }
-    if (bind(sockfd, (const struct sockaddr*) addr, sizeof(const struct sockaddr)) == -1)
+    if (bind(sockfd, (const struct sockaddr*)&addr, sizeof(const struct sockaddr)) == -1)
     {
         std::cout << "Error: init_socket(): bind() failed." << std::endl;
         return (1);
@@ -43,31 +46,5 @@ int init_socket( int &sockfd, struct sockaddr_in *addr )
 		std::cout << "Error: init_socket(): bind() failed." << std::endl;
         return (1);
 	}
-    return (0);
-}
-
-int main( void )
-{
-    int sockfd = 0;
-	struct sockaddr_in addr;
-
-    if (init_socket(sockfd, &addr) == 1 )
-    {
-        return (1);
-    }
-
-    char s[3] = {0};
-    while (1)
-    {
-        if (listen(sock, 3) != -1)
-        {
-            
-        }
-        else
-        {
-            std::cout << "Error: listen() failed." << std::endl;
-        }
-    }
-    
     return (0);
 }

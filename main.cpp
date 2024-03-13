@@ -19,6 +19,7 @@ int	main(int argc, char **argv)
 	}
 
 	Server	serv(argv);
+	serv.initSocket();
 	try
 	{
 		signal(SIGINT, Server::signalHandler);

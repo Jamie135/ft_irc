@@ -16,7 +16,7 @@
 class Server
 {
 private:
-	int	socketFd;
+	int	sockfd;
 	int	port; //server port
 	std::string	pass; // mot de pass
 	std::map<int, Client*>   clients; // vector des clients
@@ -26,7 +26,7 @@ public:
 	~Server();
 
 	void	initServer(); // intitalise le server
-	void	initSocket(); // initialise le socket
+	int	initSocket(); // initialise le socket
 	void	acceptClient(); // accepter un nouveau client
 	void	eventClient(); // receive event from registered client
 	static void signalHandler(int signum); // signal handler
