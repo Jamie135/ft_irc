@@ -19,7 +19,4 @@ private:
 public:
 	Client();
 	~Client();
-
-	int	getFd();
-	void	setFd(int n);
 };
