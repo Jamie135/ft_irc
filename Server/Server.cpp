@@ -92,6 +92,7 @@ void	Server::checkPoll()
 	}
 }
 
+// accepte une nouvelle connexion entrante sur un sockfd et récupère le fd du nouveau socket créé
 void 	Server::newConnection()
 {
 	int	new_socket;
