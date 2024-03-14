@@ -23,15 +23,17 @@ private:
 	static bool signal; // static boolean pour le signal
 	struct pollfd	poll_fd[11]; // tableau de 11 structures pollfd utilisées pour surveiller 11 files descriptors dont 1 correspond a sockfd
 	int	poll_size;
-	int addr_len;
+	int	poll_num;
+	int	status;
 
 public:
 	Server(char **argv);
 	~Server();
 
-	void	initServer(); // intitalise le server
-	void	initSocket(); // initialise le socket
-	void	acceptClient(); // accepter un nouveau client
-	void	eventClient(); // receive event from registered client
-	static void signalHandler(int signum); // signal handler
+	void	initServer();
+	void	checkPoll();
+	void	newConnection();
+	void	addPoll();
+	void	eventClient();
+	static void signalHandler(int signum);
 };

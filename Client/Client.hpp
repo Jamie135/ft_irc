@@ -16,6 +16,7 @@ class Client
 {
 private:
 	int	fd;
+	std::string	nickname;
 public:
 	Client();
 	~Client();
