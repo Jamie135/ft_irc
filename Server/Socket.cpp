@@ -8,18 +8,11 @@
 int Server::initSocket()
 {
     struct sockaddr_in addr;
-    
-    if (sockfd != 0)
-    {
-        std::cout << "Error: init_socket(): parameter not initialized." << std::endl;
-        return (1);
-    }
 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
     {
         std::cout << "Error: init_socket(): socket() failed." << std::endl;
-        return (1);
+        exit(EXIT_FAILURE);
     }
     std::cout << "Socket == " << sockfd << std::endl;
 
@@ -27,25 +20,25 @@ int Server::initSocket()
 	(addr).sin_port = htons(port);
 
     int opt_val = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val)) == -1)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val)) < 0)
     {
         std::cout << "Error: init_socket(): sotsockopt() failed." << std::endl;
-        return (1);
+        exit(EXIT_FAILURE);
     }
-    if (fcntl(sockfd, F_SETFD, O_NONBLOCK) == -1)
+    if (fcntl(sockfd, F_SETFD, O_NONBLOCK) < 0)
     {
         std::cout << "Error: init_socket(): fcntl() failed." << std::endl;
-        return (1);
+        exit(EXIT_FAILURE);
     }
-    if (bind(sockfd, (const struct sockaddr*)&addr, sizeof(const struct sockaddr)) == -1)
+    if (bind(sockfd, (const struct sockaddr*)&addr, sizeof(const struct sockaddr)) < 0)
     {
         std::cout << "Error: init_socket(): bind() failed." << std::endl;
-        return (1);
+        exit(EXIT_FAILURE);
     }
-	if (listen(sockfd, 3) == -1)
+	if (listen(sockfd, 3) < 0)
 	{
 		std::cout << "Error: init_socket(): bind() failed." << std::endl;
-        return (1);
+        exit(EXIT_FAILURE);
 	}
     return (0);
 }
