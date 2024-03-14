@@ -10,13 +10,24 @@
 #include <arpa/inet.h> //-> for inet_ntoa()
 #include <poll.h> //-> for poll()
 #include <csignal> //-> for signal()
-#include "../Server/Server.hpp"
+#include <stdlib.h>
+#include <cerrno>
+#include <cstring>
+// #include "../Server/Server.hpp"
 
 class Client
 {
 private:
-	int	fd;
+	int	sockfd;
+	int port;
+	socklen_t	socklen;
+	struct sockaddr_in addr;
+
 public:
 	Client();
+	Client( char *arg );
 	~Client();
+
+	int initSocket( void );
+	int	sendConnectionRequest( void );
 };

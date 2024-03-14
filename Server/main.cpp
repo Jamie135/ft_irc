@@ -8,7 +8,7 @@
 #include <arpa/inet.h> //-> for inet_ntoa()
 #include <poll.h> //-> for poll()
 #include <csignal> //-> for signal()
-#include "./Server/Server.hpp"
+#include "./Server.hpp"
 
 int	main(int argc, char **argv)
 {
@@ -28,6 +28,10 @@ int	main(int argc, char **argv)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
+	}
+	if (serv.acceptClient() != 0)
+	{
+		return (1);
 	}
 	return (0);
 }
