@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <poll.h>
 #include "Server.hpp"
 
 int Server::initSocket()
