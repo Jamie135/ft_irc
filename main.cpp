@@ -19,7 +19,7 @@ int	main(int argc, char **argv)
 	}
 
 	Server	serv(argv);
-	serv.initSocket();
+	serv.initServer();
 	serv.checkPoll();
 	try
 	{

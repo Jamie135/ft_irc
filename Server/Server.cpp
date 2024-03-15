@@ -11,11 +11,6 @@ Server::Server(char **argv)
 
 Server::~Server()
 {
-	std::cout << "Server destructed" << std::endl;
-	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
-	{
-		delete it->second;
-	}
 }
 
 bool	Server::signal = false;
@@ -71,10 +66,10 @@ void    Server::initServer()
 // boucle qui surveille les activités des files descriptors avec poll()
 void	Server::checkPoll()
 {
-	while (Server::signal = false)
+	while (Server::signal == false)
 	{
 		status = poll(poll_fd, poll_num, -1);
-		if (status < 0)
+		if (status < 0 && Server::signal == false)
 			break;
 		else if (status == 0)
 		{
@@ -83,34 +78,72 @@ void	Server::checkPoll()
 		}
 		for (int i = 1; i < poll_num; i++)
 		{
+			if ((poll_fd[i].revents & POLLIN) != 1) //verfier si on peut read le socket
+			{
+				continue;
+			}
 			std::cout << "[" << poll_fd[i].fd << "] Ready" << std::endl;
 			if (poll_fd[i].fd == sockfd)
-				Server::newConnection();
+				Server::acceptClient();
 			else
-				// on regarde les datas provenant d'un user existant
+				Server::receiveEvent(i);
 		}
 	}
 }
 
 // accepte une nouvelle connexion entrante sur un sockfd et récupère le fd du nouveau socket créé
-void 	Server::newConnection()
+void 	Server::acceptClient()
 {
-	int	new_socket;
+	int	cli_sock;
+	struct sockaddr_in	client_addr;
+ 	socklen_t	socklen = sizeof(client_addr);
 
-	new_socket = accept(sockfd, NULL, NULL);
-	if (new_socket == -1) 
-	{
-		perror("accept");
+	std::cout << "listening ..." << std::endl;
+	cli_sock = accept(sockfd, (sockaddr *) &client_addr, &socklen);
+    if (cli_sock == -1)
+    {
+        std::cerr << "Error: Server::acceptClient(): accept() failed." << std::endl;
 		exit(EXIT_FAILURE);
-	}
-	addPoll(new_socket);
-}
+    }
 
-// ajoute un fd dans le tableaux poll_fd qui attend pour etre read/write
-void	Server::addPoll()
-{
-	poll_fd[poll_num].fd = new_fd;
+	// ajoute le fd de cli_sock dans la tableau de structure pollfd a l'indice pollnum
+	poll_fd[poll_num].fd = cli_sock;
     poll_fd[poll_num].events = POLLIN | POLLOUT;
 	poll_fd[poll_num].revents = 0;
     poll_num++;
+
+    std::cout << "> Client: A new connection is just being accepted." << std::endl;
+	char	buf[5] = {0};
+	int		res = 1;
+	while (res > 0)
+	{
+		res = recv(cli_sock, buf, 5, 0);
+		if (res == -1)
+		{
+			std::cerr << "Error: Server::acceptClient(): recv() failed." << std::endl;
+			std::cerr << "Error " << errno << ": " << strerror(errno) << std::endl;
+			std::cerr << strerror(errno) << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		std::cout << "Message: " << std::string(buf, res) << std::endl;
+		std::cout << "Bytes received: " << res << std::endl;
+	}
+	std::cout << "> Message from client received." << std::endl;
+}
+
+void	Server::receiveEvent(int i)
+{
+	char	buf[1024] = {0};
+	int	sender_fd;
+	int	bytes_read;
+
+	sender_fd = poll_fd[i].fd;
+	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0);
+	if (bytes_read <= 0)
+	{
+		std::cout << "Client" << sender_fd << "disconnected" << std::endl;
+		close(sender_fd);
+		poll_fd[i] = poll_fd[poll_num - 1];
+		poll_num--;
+	}
 }

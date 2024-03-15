@@ -1,8 +1,11 @@
 #pragma once
 
 #include <iostream>
-#include <vector> // for vector
-#include <map> // fot map
+#include <cstring>
+#include <cstdlib>
+#include <cerrno>
+#include <vector>
+#include <map>
 #include <sys/socket.h> // for socket()
 #include <sys/types.h> // for socket()
 #include <netinet/in.h> // for sockaddr_in
@@ -10,7 +13,7 @@
 #include <unistd.h> // for close()
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
-#include <csignal> // for signal()
+#include <csignal>
 #include "../Client/Client.hpp"
 
 class Server
@@ -19,7 +22,6 @@ private:
 	int	sockfd;
 	int	port; //server port
 	std::string	pass; // mot de pass
-	std::map<int, Client*>   clients; // vector des clients
 	static bool signal; // static boolean pour le signal
 	struct pollfd	poll_fd[11]; // tableau de 11 structures pollfd utilisées pour surveiller 11 files descriptors dont 1 correspond a sockfd
 	int	poll_size;
@@ -32,8 +34,8 @@ public:
 
 	void	initServer();
 	void	checkPoll();
-	void	newConnection();
+	void	acceptClient();
 	void	addPoll();
-	void	eventClient();
+	void	receiveEvent(int i);
 	static void signalHandler(int signum);
 };
