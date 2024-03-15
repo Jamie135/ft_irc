@@ -146,4 +146,8 @@ void	Server::receiveEvent(int i)
 		poll_fd[i] = poll_fd[poll_num - 1];
 		poll_num--;
 	}
+	else
+	{
+		buf[bytes_read] = 0; // NULL terminated the buffer
+	}
 }
