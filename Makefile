@@ -5,7 +5,6 @@ CPPFLAGS = -std=c++98
 
 SRCS =	main.cpp \
 		Server/Server.cpp \
-		Server/Socket.cpp \
 		Client/Client.cpp
 
 OBJS = $(SRCS:.cpp=.o)
