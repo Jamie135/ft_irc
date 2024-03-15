@@ -35,7 +35,6 @@ public:
 	void	initServer();
 	void	checkPoll();
 	void	acceptClient();
-	void	addPoll();
 	void	receiveEvent(int i);
 	static void signalHandler(int signum);
 };
