@@ -133,13 +133,13 @@ void 	Server::acceptClient()
 
 void	Server::receiveEvent(int i)
 {
-	char	buf[1024] = {0};
+	char	buf[1024] = {0}; // array pour stocker les datas recus
 	int	sender_fd;
 	int	bytes_read;
 
 	sender_fd = poll_fd[i].fd;
-	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0);
-	if (bytes_read <= 0)
+	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
+	if (bytes_read <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
 	{
 		std::cout << "Client" << sender_fd << "disconnected" << std::endl;
 		close(sender_fd);
