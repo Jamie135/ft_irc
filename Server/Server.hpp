@@ -36,7 +36,7 @@ public:
 	void	initServer();
 	void	checkPoll();
 	void	acceptClient();
-	void	acceptUser(int fd, std::string str);
+	void	acceptUser(int fd, std::string buff);
 	void	receiveEvent(int i);
 	static void signalHandler(int signum);
 };

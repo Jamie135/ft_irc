@@ -158,6 +158,6 @@ void	Server::receiveEvent(int i)
 // lorsqu'un nouvel utilisateur tente de se connecter au serveur, 
 // elle vérifie les informations fournies par le client 
 // et crée un nouvel utilisateur s'il remplit toutes les conditions nécessaires
-void	Server::acceptUser(int fd, std::string str)
+void	Server::acceptUser(int fd, std::string buff)
 {
 }
