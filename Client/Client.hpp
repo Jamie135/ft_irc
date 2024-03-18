@@ -13,7 +13,6 @@
 #include <unistd.h> // for close()
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
-#include "../Server/Server.hpp"
 
 class Client
 {

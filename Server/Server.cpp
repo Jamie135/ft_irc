@@ -68,7 +68,7 @@ void	Server::checkPoll()
 {
 	while (Server::signal == false)
 	{
-		status = poll(poll_fd, poll_num, -1);
+		status = poll(poll_fd, poll_num, 5000);
 		if (status < 0 && Server::signal == false)
 			break;
 		else if (status == 0)
@@ -76,13 +76,13 @@ void	Server::checkPoll()
 			std::cout << "Waiting for connection..." << std::endl;
 			continue;
 		}
-		for (int i = 1; i < poll_num; i++)
+		for (int i = 0; i < poll_num; i++)
 		{
 			if ((poll_fd[i].revents & POLLIN) != 1) //verfier si on peut read le socket
 			{
 				continue;
 			}
-			std::cout << "[" << poll_fd[i].fd << "] Ready" << std::endl;
+			std::cout << "Client[" << poll_fd[i].fd << "] Ready" << std::endl;
 			if (poll_fd[i].fd == sockfd)
 				Server::acceptClient();
 			else
@@ -124,7 +124,7 @@ void	Server::receiveEvent(int i)
 	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
 	if (bytes_read <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
 	{
-		std::cout << "Client" << sender_fd << "disconnected" << std::endl;
+		std::cout << "Client[" << sender_fd << "] disconnected" << std::endl;
 		close(sender_fd);
 		poll_fd[i] = poll_fd[poll_num - 1];
 		poll_num--;
@@ -154,10 +154,11 @@ void	Server::receiveEvent(int i)
 	}
 }
 
-// cette fonction traite les données reçues 
+// cette fonction va traiter les données reçues 
 // lorsqu'un nouvel utilisateur tente de se connecter au serveur, 
-// elle vérifie les informations fournies par le client 
-// et crée un nouvel utilisateur s'il remplit toutes les conditions nécessaires
+// elle va vérifier les informations fournies par le client 
+// et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
 void	Server::acceptUser(int fd, std::string buff)
 {
+	std::cout << "fd: " << fd << " buff: " << buff << std::endl;
 }
