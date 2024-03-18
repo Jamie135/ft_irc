@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector> // for vector
 #include <map> // fot map
+#include <string>
+
 #include <sys/socket.h> // for socket()
 #include <sys/types.h> // for socket()
 #include <netinet/in.h> // for sockaddr_in
@@ -24,6 +26,7 @@ private:
 	static bool signal; // static boolean pour le signal
 	struct sockaddr_in	addr;
 	socklen_t	socklen;
+	bool	(Server::*parse[8])(std::string split_mess[4]);
 public:
 	Server(char **argv);
 	~Server();
@@ -33,4 +36,8 @@ public:
 	int	acceptClient( void ); // accepter un nouveau client
 	void	eventClient(); // receive event from registered client
 	static void signalHandler(int signum); // signal handler
+
+	int	splitMessage( std::string message, std::string *split_mess );
+	int	parseCommand( std::string command );
+	int	parseMessage( std::string message );
 };

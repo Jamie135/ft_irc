@@ -7,7 +7,8 @@ CPPFLAGS = -std=c++98
 OBJDIR = .obj
 
 SRCSSRV =	Server/main.cpp \
-			Server/Server.cpp
+			Server/Server.cpp \
+			Server/commandParsing.cpp
 
 SRCSCLI	=	Client/cmain.cpp \
 			Client/Client.cpp

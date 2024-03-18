@@ -3,6 +3,7 @@
 Server::Server(char **argv): port(atoi(argv[1])), pass(argv[2])
 {
 	socklen = sizeof(addr);
+	
 }
 
 Server::~Server()
@@ -93,3 +94,4 @@ int	Server::acceptClient( void )
 	std::cout << "> Message from client received." << std::endl;
 	return (0);
 }
+

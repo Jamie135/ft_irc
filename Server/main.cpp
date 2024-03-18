@@ -10,7 +10,33 @@
 #include <csignal> //-> for signal()
 #include "./Server.hpp"
 
-int	main(int argc, char **argv)
+// int	main(int argc, char **argv)
+// {
+// 	if (argc != 3)
+// 	{
+// 		std::cerr << "Error: Syntax must be ./ircserv <port> <password>";
+// 		return (0);
+// 	}
+
+// 	Server	serv(argv);
+// 	serv.initSocket();
+// 	try
+// 	{
+// 		signal(SIGINT, Server::signalHandler);
+// 		signal(SIGQUIT, Server::signalHandler);
+// 	}
+// 	catch(const std::exception& e)
+// 	{
+// 		std::cerr << e.what() << std::endl;
+// 	}
+// 	if (serv.acceptClient() != 0)
+// 	{
+// 		return (1);
+// 	}
+// 	return (0);
+// }
+
+int	main( int argc, char **argv )
 {
 	if (argc != 3)
 	{
@@ -19,19 +45,26 @@ int	main(int argc, char **argv)
 	}
 
 	Server	serv(argv);
-	serv.initSocket();
-	try
-	{
-		signal(SIGINT, Server::signalHandler);
-		signal(SIGQUIT, Server::signalHandler);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << std::endl;
-	}
-	if (serv.acceptClient() != 0)
-	{
-		return (1);
-	}
+	std::string message(":sender PRIVMSG #channel :Hello, everyone!");
+	serv.parseMessage(message);
+	std::cout << std::endl << std::endl;
+	message = std::string("PASS secretpasswordhere");
+	serv.parseMessage(message);
+	std::cout << std::endl << std::endl;
+	message = std::string(":WiZ NICK Kilroy");
+	serv.parseMessage(message);
+	std::cout << std::endl << std::endl;
+	message = std::string("JOIN #foo,#bar fubar,foobar");
+	serv.parseMessage(message);
+	std::cout << std::endl << std::endl;
+	message = std::string(":Wiz TOPIC #test :New topic ");
+	serv.parseMessage(message);
+	std::cout << std::endl << std::endl;
+	message = std::string(":Angel INVITE Wiz #Dust");
+	serv.parseMessage(message);
+	std::cout << std::endl << std::endl;
+	message = std::string("");
+	serv.parseMessage(message);
+
 	return (0);
 }
