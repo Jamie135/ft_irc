@@ -4,8 +4,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
-#include <vector>
 #include <map>
+#include <vector>
 #include <sys/socket.h> // for socket()
 #include <sys/types.h> // for socket()
 #include <netinet/in.h> // for sockaddr_in
@@ -13,7 +13,7 @@
 #include <unistd.h> // for close()
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
-#include <csignal>
+#include <csignal> // for signal()
 #include "../Client/Client.hpp"
 
 class Server
@@ -27,7 +27,8 @@ private:
 	int	poll_size;
 	int	poll_num;
 	int	status;
-
+	std::map<int, Client*>	sockclient;
+	std::map<int, std::string>	buffer;
 public:
 	Server(char **argv);
 	~Server();
@@ -35,6 +36,7 @@ public:
 	void	initServer();
 	void	checkPoll();
 	void	acceptClient();
+	void	acceptUser(int fd, std::string str);
 	void	receiveEvent(int i);
 	static void signalHandler(int signum);
 };

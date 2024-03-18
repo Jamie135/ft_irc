@@ -111,26 +111,9 @@ void 	Server::acceptClient()
     poll_fd[poll_num].events = POLLIN | POLLOUT;
 	poll_fd[poll_num].revents = 0;
     poll_num++;
-
-    std::cout << "> Client: A new connection is just being accepted." << std::endl;
-	char	buf[5] = {0};
-	int		res = 1;
-	while (res > 0)
-	{
-		res = recv(cli_sock, buf, 5, 0);
-		if (res == -1)
-		{
-			std::cerr << "Error: Server::acceptClient(): recv() failed." << std::endl;
-			std::cerr << "Error " << errno << ": " << strerror(errno) << std::endl;
-			std::cerr << strerror(errno) << std::endl;
-			exit(EXIT_FAILURE);
-		}
-		std::cout << "Message: " << std::string(buf, res) << std::endl;
-		std::cout << "Bytes received: " << res << std::endl;
-	}
-	std::cout << "> Message from client received." << std::endl;
 }
 
+// lire les données provenant d'un socket et traite les données lues en fonction du socket expéditeur
 void	Server::receiveEvent(int i)
 {
 	char	buf[1024] = {0}; // array pour stocker les datas recus
@@ -149,5 +132,32 @@ void	Server::receiveEvent(int i)
 	else
 	{
 		buf[bytes_read] = 0; // NULL terminated the buffer
+
+		// ici nous allons mettre les codes de traitement des datas recus: 
+		// tels que le parsing, l'authentification, les commandes, etc...
+
+		// si le socket expéditeur n'est pas déjà enregistré dans sockclient,
+		// les données lues sont ajoutées au map buffer associé au socket expéditeur,
+		// puis la fonction acceptUser() est appelée pour traiter les données du client
+		if (sockclient.find(sender_fd) == sockclient.end())
+		{
+			buffer[sender_fd] += buf;
+			Server::acceptUser(sender_fd, buffer[sender_fd]);
+		}
+		// sinon, les données lues sont ajoutées au map buffer,
+		// puis on traite les commandes
+		else
+		{
+			buffer[sender_fd] += buf;
+			// traiter les commandes
+		}
 	}
+}
+
+// cette fonction traite les données reçues 
+// lorsqu'un nouvel utilisateur tente de se connecter au serveur, 
+// elle vérifie les informations fournies par le client 
+// et crée un nouvel utilisateur s'il remplit toutes les conditions nécessaires
+void	Server::acceptUser(int fd, std::string str)
+{
 }
