@@ -3,7 +3,15 @@
 Server::Server(char **argv): port(atoi(argv[1])), pass(argv[2])
 {
 	socklen = sizeof(addr);
-	
+
+	parse[0] = &Server::parseNick;
+	parse[1] = &Server::parseUser;
+	parse[2] = &Server::parseJoin;
+	parse[3] = &Server::parsePrivmsg;
+	parse[4] = &Server::parseTopic;
+	parse[5] = &Server::parseMode;
+	parse[6] = &Server::parseKick;
+	parse[7] = &Server::parseInvite;
 }
 
 Server::~Server()

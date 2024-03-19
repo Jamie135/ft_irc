@@ -20,7 +20,7 @@ class Client
 private:
 	int	sockfd;
 	int port;
-	socklen_t	socklen;
+	// socklen_t	socklen;
 	struct sockaddr_in addr;
 
 public:

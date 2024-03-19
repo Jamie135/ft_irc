@@ -14,6 +14,7 @@
 #include <poll.h> // for poll()
 #include <csignal> // for signal()
 #include <stdlib.h>
+#include <stdint.h>
 #include "../Client/Client.hpp"
 
 class Server
@@ -26,7 +27,7 @@ private:
 	static bool signal; // static boolean pour le signal
 	struct sockaddr_in	addr;
 	socklen_t	socklen;
-	bool	(Server::*parse[8])(std::string split_mess[4]);
+	int	(Server::*parse[8])(std::string split_mess[3]);
 public:
 	Server(char **argv);
 	~Server();
@@ -37,7 +38,18 @@ public:
 	void	eventClient(); // receive event from registered client
 	static void signalHandler(int signum); // signal handler
 
-	int	splitMessage( std::string message, std::string *split_mess );
-	int	parseCommand( std::string command );
+	int	splitMessage( std::string message, std::string split_mess[3] );
+	int	splitParams( std::string params, std::string split_params[3] );
+
+	int	parseNick( std::string split_mess[3] );
+	int	parseUser( std::string split_mess[3] );
+	int	parseJoin( std::string split_mess[3] );
+	int	parsePrivmsg( std::string split_mess[3] );
+	int	parseTopic( std::string split_mess[3] );
+	int	parseMode( std::string split_mess[3] );
+	int	parseKick( std::string split_mess[3] );
+	int	parseInvite( std::string split_mess[3] );
+
+	int8_t	parseCommand( std::string command );
 	int	parseMessage( std::string message );
 };

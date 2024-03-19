@@ -9,35 +9,33 @@ void	goToNextSpace( std::string s, size_t *i )
 	}
 }
 
-int	parsePass( std::string split_mess[3] )
-{
-	/*
-	Example:
-		PASS secretpasswordhere
-	*/
+// int	Server::parsePass( std::string split_mess[3] )
+// {
+// 	/*
+// 	Example:
+// 		PASS secretpasswordhere
+// 	*/
 
-	if (split_mess[0].empty() == 0)
-	{
-		std::cerr << "Error: parsePass(): prefix should be empty." << std::endl;
-		return (1);
-	}
-	if (split_mess[2].empty() == 1)
-	{
-		std::cerr << "Error: parsePass(): parameters should not be empty." << std::endl;
-		return (1);
-	}
-	return (0);
-}
+// 	if (split_mess[0].empty() == 0)
+// 	{
+// 		std::cerr << "Error: parsePass(): prefix should be empty." << std::endl;
+// 		return (1);
+// 	}
+// 	if (split_mess[2].empty() == 1)
+// 	{
+// 		std::cerr << "Error: parsePass(): parameters should not be empty." << std::endl;
+// 		return (1);
+// 	}
+// 	return (0);
+// }
 
-int	parseNick( std::string split_mess[3] )
+int	Server::parseNick( std::string split_mess[3] )
 {
 	/*
 	Example:
 		NICK Wiz	; Introducing new nick "Wiz".
 		:WiZ NICK Kilroy	; WiZ changed his nickname to Kilroy.
 	*/
-	(void) split_mess;
-
 	if (split_mess[2].empty() == 1)
 	{
 		std::cerr << "Error: parseNick(): parameters can't be empty()." << std::endl;
@@ -53,13 +51,13 @@ int	parseNick( std::string split_mess[3] )
 	return (0);
 }
 
-int	parseUser( std::string split_mess[3] )
+int	Server::parseUser( std::string split_mess[3] )
 {
 	(void) split_mess;
 	return (0);
 }
 
-int	parseJoin( std::string split_mess[3] )
+int	Server::parseJoin( std::string split_mess[3] )
 {
 	/*
 	Examples:
@@ -86,7 +84,7 @@ int	parseJoin( std::string split_mess[3] )
 	return (0);
 }
 
-int parsePrivmsg( std::string split_mess[3] )
+int Server::parsePrivmsg( std::string split_mess[3] )
 {
 	/*
 	Examples:
@@ -111,31 +109,95 @@ int parsePrivmsg( std::string split_mess[3] )
 	return (0);
 }
 
-int	parseKick( std::string split_mess[3] )
+int	Server::splitParams( std::string params, std::string splitParams[3] )
+{
+	size_t	i = 0;
+	size_t	k = 0;
+	for (int8_t j = 0; i <= params.length() && j < 3; j++)
+	{
+		std::cout << ">> j == " << j << std::endl;
+		k = i;
+		i = params.find_first_of(" ", k);
+		if (i == std::string::npos)
+		{
+			splitParams[j] = params.substr(k);
+		}
+		else if (i < params.length())
+		{
+			splitParams[j] = params.substr(k, i);
+		}
+		std::cout << "splitParams[" << (int)j << "] == [" << splitParams[j] << "]" << std::endl;
+		std::cout << "i += " << (1 & (params[i] == ' ')) << std::endl;
+		i += (1 & (params[i] == ' '));
+	}
+
+	return (0);
+}
+
+int	Server::parseKick( std::string split_mess[3] )
+{
+	std::cout << "> In Server::parseKick()" << std::endl;
+	/*
+	Examples:
+	KICK &Melbourne Matthew
+			; Kick Matthew from &Melbourne
+	KICK #Finnish John :Speaking English
+			; Kick John from #Finnish using "Speaking English" as the reason (comment).
+	:WiZ KICK #Finnish John
+			; KICK message from WiZ to remove John from channel #Finnish
+	*/
+
+	// std::cout << "splitmessage[0] == [" << split_mess[0] << "]" << std::endl;
+	// std::cout << "splitmessage[1] == [" << split_mess[1] << "]" << std::endl;
+	// std::cout << "splitmessage[2] == [" << split_mess[2] << "]" << std::endl;
+
+	if (split_mess[2].empty() == 1)
+	{
+		std::cerr << "Error: parseKick(): no parameters" << std::endl;
+		return (1);
+	}
+	std::string splitParams[3] = {std::string(), std::string(), std::string()};
+
+	if (splitParams(split_mess[2], splitParams) == 1)
+	{
+		return (1);
+	}
+	
+	if (splitParams[0].empty() == 0 && splitParams[1].empty() == 1)
+	{
+		std::cerr << "Error: parseKick(): not enough arguments" << std::endl;
+		return (1);
+	}
+
+	/*
+		Check if channel exists
+		Check if user exists and is in the channel
+		Check if user has right to run the command
+		Check if user can be kicked from the channel
+	*/
+	
+	return (0);
+}
+
+int	Server::parseInvite( std::string split_mess[3] )
 {
 	(void) split_mess;
 	return (0);
 }
 
-int	parseInvite( std::string split_mess[3] )
+int	Server::parseTopic( std::string split_mess[3] )
 {
 	(void) split_mess;
 	return (0);
 }
 
-int	parseTopic( std::string split_mess[3] )
+int	Server::parseMode( std::string split_mess[3] )
 {
 	(void) split_mess;
 	return (0);
 }
 
-int	parseMode( std::string split_mess[3] )
-{
-	(void) split_mess;
-	return (0);
-}
-
-int	Server::parseCommand( std::string command )
+int8_t	Server::parseCommand( std::string command )
 {
 	/*
 	NICK: Used to set or change the user's nickname.
@@ -148,11 +210,10 @@ int	Server::parseCommand( std::string command )
     INVITE: Used to invite a user to a channel.
 	*/
 	(void) command;
-	(void) split_mess;
 
 	std::string cmds[] = {"NICK", "USER", "JOIN", "PRIVMSG", "TOPIC", "MODE", "KICK", "INVITE"};
 
-	for (uint8_t i = 0; i < 8; i++)
+	for (int8_t i = 0; i < 8; i++)
 	{
 		if (command[0] == cmds[i][0])
 		{
@@ -162,15 +223,15 @@ int	Server::parseCommand( std::string command )
 	return (-1);
 }
 
-int	Server::splitMessage( std::string message, std::string *split_mess )
+int	Server::splitMessage( std::string message, std::string split_mess[3] )
 {
 	std::string	s_tmp;
 	size_t	i = 0;
 
 	if (message[i] == ':')
 	{
-		s_tmp = message.substr(message.find_first_of(" "));
-		std::cout << "prefix == [" << split_mess << "]" << std::endl;
+		s_tmp = message.substr(0, message.find_first_of(" "));
+		std::cout << "prefix == [" << s_tmp << "]" << std::endl;
 		split_mess[0] = s_tmp;
 		// Go to next element
 		goToNextSpace(message, &i);
@@ -180,6 +241,10 @@ int	Server::splitMessage( std::string message, std::string *split_mess )
 			std::cout << "Quitting" << std::endl;
 			return (1);
 		}
+	}
+	else
+	{
+		split_mess[0] = std::string("");
 	}
 
 	s_tmp = message.substr(i, message.find_first_of(" ", i) - i);
@@ -198,6 +263,7 @@ int	Server::splitMessage( std::string message, std::string *split_mess )
 		std::cout << "params == [" << s_tmp << "]" << std::endl;
 		split_mess[2].append(s_tmp);
 	}
+	return (0);
 }
 
 int	Server::parseMessage( std::string message )
@@ -208,11 +274,13 @@ int	Server::parseMessage( std::string message )
 
 	splitMessage(message, split_mess);
 
-	int	cmd = parseCommand(split_mess[1]);
+	std::cout << "splitmessage[0] == [" << split_mess[0] << "]" << std::endl;
+	std::cout << "splitmessage[1] == [" << split_mess[1] << "]" << std::endl;
+	std::cout << "splitmessage[2] == [" << split_mess[2] << "]" << std::endl;
+
+	int8_t	cmd = parseCommand(split_mess[1]);
 	if (cmd == -1)
 		return (1);
 	
-	if ( (this->*parse[cmd])(split_mess) == 1 )
-		return (1);
-	return (0);
+	return ( (this->*parse[cmd])(split_mess) == 1 );
 }

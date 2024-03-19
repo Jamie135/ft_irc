@@ -44,26 +44,33 @@ int	main( int argc, char **argv )
 		return (0);
 	}
 
+
 	Server	serv(argv);
-	std::string message(":sender PRIVMSG #channel :Hello, everyone!");
-	serv.parseMessage(message);
+	std::string message;
+	
+	// message = std::string(":sender PRIVMSG #channel :Hello, everyone!");
+	// serv.parseMessage(message);
+	// std::cout << std::endl << std::endl;
+	// message = std::string("PASS secretpasswordhere");
+	// serv.parseMessage(message);
+	// std::cout << std::endl << std::endl;
+	// message = std::string(":WiZ NICK Kilroy");
+	// serv.parseMessage(message);
+	// std::cout << std::endl << std::endl;
+	// message = std::string("JOIN #foo,#bar fubar,foobar");
+	// serv.parseMessage(message);
+	// std::cout << std::endl << std::endl;
+	// message = std::string(":Wiz TOPIC #test :New topic ");
+	// serv.parseMessage(message);
+	// std::cout << std::endl << std::endl;
+	// message = std::string(":Angel INVITE Wiz #Dust");
+	// serv.parseMessage(message);
+	// std::cout << std::endl << std::endl;
+	// message = std::string("");
+	// serv.parseMessage(message);
+
 	std::cout << std::endl << std::endl;
-	message = std::string("PASS secretpasswordhere");
-	serv.parseMessage(message);
-	std::cout << std::endl << std::endl;
-	message = std::string(":WiZ NICK Kilroy");
-	serv.parseMessage(message);
-	std::cout << std::endl << std::endl;
-	message = std::string("JOIN #foo,#bar fubar,foobar");
-	serv.parseMessage(message);
-	std::cout << std::endl << std::endl;
-	message = std::string(":Wiz TOPIC #test :New topic ");
-	serv.parseMessage(message);
-	std::cout << std::endl << std::endl;
-	message = std::string(":Angel INVITE Wiz #Dust");
-	serv.parseMessage(message);
-	std::cout << std::endl << std::endl;
-	message = std::string("");
+	message = std::string(":WiZ KICK #Finnish John");
 	serv.parseMessage(message);
 
 	return (0);
