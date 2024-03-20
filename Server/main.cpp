@@ -70,7 +70,8 @@ int	main( int argc, char **argv )
 	// serv.parseMessage(message);
 
 	std::cout << std::endl << std::endl;
-	message = std::string(":WiZ KICK #Finnish John");
+	// message = std::string(":WiZ KICK #Finnish John");
+	message = std::string(":WiZ KICK #Finnish");
 	serv.parseMessage(message);
 
 	return (0);
