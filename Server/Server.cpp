@@ -160,5 +160,25 @@ void	Server::receiveEvent(int i)
 // et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
 void	Server::acceptUser(int fd, std::string buff)
 {
-	std::cout << "fd: " << fd << " buff: " << buff << std::endl;
+	std::cout << "\nfd: " << fd << "\nbuff:\n" << buff << std::endl;
+
+	std::string	cap_ls;
+	std::string password;
+	std::string nickname;
+	std::string user;
+	int	endline;
+
+	endline = buff.find('\n');
+	cap_ls = buff.substr(0, endline);
+	std::cout << cap_ls << std::endl;
+	buff.erase(0, endline + 1);
+	endline = buff.find('\n');
+	password = buff.substr(0, endline);
+	if (password.find("PASS :") == std::string::npos)
+	{
+		std::cout << "Missing password" << std::endl;
+		buffer[fd] = "";
+		return ;
+	}
+	password = password.substr(6);
 }
