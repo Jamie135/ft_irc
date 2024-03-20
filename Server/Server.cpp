@@ -187,7 +187,7 @@ void	Server::acceptUser(int fd, std::string buff)
 	}
 	password = password.substr(5);
 	// vérifie si le mot de passe est correcte
-	if (password != this->pass)
+	if (password.compare(this->pass) != 0)
 	{
 		// std::cout << "password: " << password << std::endl;
 		// std::cout << "pass: " << this->pass << std::endl;
