@@ -4,6 +4,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+#include <stdio.h>
+#include <algorithm>
 #include <map>
 #include <vector>
 #include <sys/socket.h> // for socket()

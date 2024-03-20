@@ -160,25 +160,61 @@ void	Server::receiveEvent(int i)
 // et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
 void	Server::acceptUser(int fd, std::string buff)
 {
-	std::cout << "\nfd: " << fd << "\nbuff:\n" << buff << std::endl;
-
 	std::string	cap_ls;
 	std::string password;
 	std::string nickname;
-	std::string user;
 	int	endline;
 
+	std::string	error;
+
+	if (std::count(buff.begin(), buff.end(), '\n') < 3)
+		return;
 	endline = buff.find('\n');
 	cap_ls = buff.substr(0, endline);
 	std::cout << cap_ls << std::endl;
 	buff.erase(0, endline + 1);
 	endline = buff.find('\n');
 	password = buff.substr(0, endline);
-	if (password.find("PASS :") == std::string::npos)
+
+	// vérifie si la ligne du mot de passe contient "PASS :"
+	if (password.find("PASS ") == std::string::npos)
 	{
 		std::cout << "Missing password" << std::endl;
+		error = ":localhost 461 PASS :\n";
+		send(fd, error.c_str(), error.length(), 0);
 		buffer[fd] = "";
 		return ;
 	}
-	password = password.substr(6);
+	password = password.substr(5);
+	// vérifie si le mot de passe est correcte
+	if (password != this->pass)
+	{
+		// std::cout << "password: " << password << std::endl;
+		// std::cout << "pass: " << this->pass << std::endl;
+		std::cout << "Wrong password" << std::endl;
+		error = ":localhost 461 PASS :\n";
+		send(fd, error.c_str(), error.length(), 0);
+		buffer[fd] = "";
+		return ;
+	}
+	buff.erase(0, endline + 1);
+	endline = buff.find('\n');
+	nickname = buff.substr(0, endline);
+	nickname = nickname.substr(5);
+	std::cout << nickname << std::endl;
+
+	// vérifie si le nickname est deja pris
+	for (std::map<int, User*>::iterator it = sockclient.begin(); it != sockclient.end(); it++)
+	{
+		if (it->second->getNickName() == nickname)
+		{
+			error = ":localhost 433 " + nickname + " :\n";
+			send(fd, error.c_str(), error.length(), 0);
+			buffer[fd] = "";
+			return ;
+		}
+	}
+	buff.erase(0, endline + 1);
+	sockclient[fd] = new User(fd, nickname);
+	buffer[fd] = "";
 }
