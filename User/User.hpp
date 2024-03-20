@@ -14,12 +14,17 @@
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
 
-class Client
+class User
 {
 private:
-	int	fd_user;
+	int	fdUser;
 	std::string	nickname;
+	std::string	name;
 public:
-	Client();
-	~Client();
+	User(int fdNew, std::string const &nicknameNew);
+	~User();
+	int	getFdUser();
+	std::string const	&getNickName() const;
+	std::string const	&getName() const;
+	void	setName(std::string const &nameNew);
 };

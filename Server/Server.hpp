@@ -14,7 +14,7 @@
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
 #include <csignal> // for signal()
-#include "../Client/Client.hpp"
+#include "../User/User.hpp"
 
 class Server
 {
@@ -27,7 +27,7 @@ private:
 	int	poll_size;
 	int	poll_num;
 	int	status;
-	std::map<int, Client*>	sockclient;
+	std::map<int, User*>	sockclient;
 	std::map<int, std::string>	buffer;
 public:
 	Server(char **argv);
