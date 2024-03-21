@@ -13,6 +13,9 @@
 #include <unistd.h> // for close()
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
+#include "../Channel/Channel.hpp"
+
+class Channel;
 
 class User
 {
