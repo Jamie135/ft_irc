@@ -138,6 +138,7 @@ void	Server::receiveEvent(int fd)
 		// si le socket expéditeur n'est pas déjà enregistré dans sockclient,
 		// les données lues sont ajoutées au map buffer associé au socket expéditeur,
 		// puis la fonction acceptUser() est appelée pour traiter les données du client
+		std::cout << "FD[" << fd << "] connected" << std::endl;
 		if (sockclient.find(fd) == sockclient.end())
 		{
 			buffer[fd] += buf;
@@ -159,7 +160,7 @@ void	Server::receiveEvent(int fd)
 // et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
 void	Server::acceptUser(int fd, std::string buff)
 {
-	std::cout << "buff:\n" << buff << std::endl;
+	// std::cout << "buff:\n" << buff << std::endl;
 
 	std::string	cap_ls;
 	std::string pass;
@@ -189,8 +190,9 @@ void	Server::acceptUser(int fd, std::string buff)
 	// vérifie si le mot de passe est correcte
 	if (pass.compare(this->password) != 0)
 	{
-		std::cout << "pass: " << pass << std::endl;
-		std::cout << "password: " << this->password << std::endl;
+		// std::cout << "pass: " << pass << std::endl;
+		// std::cout << "password: " << this->password << std::endl;
+		// std::cout << "compare: " << pass.compare(this->password) << std::endl;
 		std::cout << "Wrong password" << std::endl;
 		error = ":localhost 461 PASS :\n";
 		send(fd, error.c_str(), error.length(), 0);
