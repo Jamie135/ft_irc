@@ -2,15 +2,20 @@
 
 Server::Server(char **argv)
 {
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	std::cout << "Server constructed: Passive Socket == " << sockfd << std::endl;
+	std::cout << "Server constructed" << std::endl;
 	port = atoi(argv[1]);
-	pass = argv[2];
+	password = argv[2];
 	poll_size = 10;
+	max_client = 10;
 }
 
 Server::~Server()
 {
+	std::cout << "Server destroyed" << std::endl;
+	for (std::map<int, User*>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		delete it->second;
+	}
 }
 
 bool	Server::signal = false;
@@ -26,12 +31,14 @@ void    Server::initServer()
 {
     struct sockaddr_in addr;
 
-    if (sockfd == -1)
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0)
     {
         std::cerr << "Error: initServer(): socket() failed." << std::endl;
         exit(EXIT_FAILURE);
     }
 
+	std::cout << "Passive socket = " << sockfd << std::endl;
 	(addr).sin_family = AF_INET;
     (addr).sin_addr.s_addr = INADDR_ANY;
 	(addr).sin_port = htons(port);
@@ -82,9 +89,10 @@ void	Server::checkPoll()
 			{
 				continue;
 			}
-			std::cout << "Client[" << poll_fd[i].fd << "] Ready" << std::endl;
 			if (poll_fd[i].fd == sockfd)
+			{
 				Server::acceptClient();
+			}
 			else
 				Server::receiveEvent(i);
 		}
@@ -98,7 +106,6 @@ void 	Server::acceptClient()
 	struct sockaddr_in	client_addr;
  	socklen_t	socklen = sizeof(client_addr);
 
-	std::cout << "listening ..." << std::endl;
 	cli_sock = accept(sockfd, (sockaddr *) &client_addr, &socklen);
     if (cli_sock == -1)
     {
@@ -124,7 +131,7 @@ void	Server::receiveEvent(int i)
 	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
 	if (bytes_read <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
 	{
-		std::cout << "Client[" << sender_fd << "] disconnected" << std::endl;
+		std::cout << "FD[" << sender_fd << "] disconnected" << std::endl;
 		close(sender_fd);
 		poll_fd[i] = poll_fd[poll_num - 1];
 		poll_num--;
@@ -141,6 +148,7 @@ void	Server::receiveEvent(int i)
 		// puis la fonction acceptUser() est appelée pour traiter les données du client
 		if (sockclient.find(sender_fd) == sockclient.end())
 		{
+			std::cout << "FD[" << poll_fd[i].fd << "] connected" << std::endl;
 			buffer[sender_fd] += buf;
 			Server::acceptUser(sender_fd, buffer[sender_fd]);
 		}
@@ -160,11 +168,12 @@ void	Server::receiveEvent(int i)
 // et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
 void	Server::acceptUser(int fd, std::string buff)
 {
+	// std::cout << "buff:\n" << buff << std::endl;
+
 	std::string	cap_ls;
-	std::string password;
+	std::string pass;
 	std::string nickname;
 	int	endline;
-
 	std::string	error;
 
 	if (std::count(buff.begin(), buff.end(), '\n') < 3)
@@ -174,10 +183,10 @@ void	Server::acceptUser(int fd, std::string buff)
 	std::cout << cap_ls << std::endl;
 	buff.erase(0, endline + 1);
 	endline = buff.find('\n');
-	password = buff.substr(0, endline);
+	pass = buff.substr(0, endline);
 
 	// vérifie si la ligne du mot de passe contient "PASS :"
-	if (password.find("PASS ") == std::string::npos)
+	if (pass.find("PASS ") == std::string::npos)
 	{
 		std::cout << "Missing password" << std::endl;
 		error = ":localhost 461 PASS :\n";
@@ -185,12 +194,12 @@ void	Server::acceptUser(int fd, std::string buff)
 		buffer[fd] = "";
 		return ;
 	}
-	password = password.substr(5);
+	pass = pass.substr(5);
 	// vérifie si le mot de passe est correcte
-	if (password.compare(this->pass) != 0)
+	if (pass.compare(this->password) != 0)
 	{
-		// std::cout << "password: " << password << std::endl;
-		// std::cout << "pass: " << this->pass << std::endl;
+		// std::cout << "pass: " << pass << std::endl;
+		// std::cout << "password: " << this->password << std::endl;
 		std::cout << "Wrong password" << std::endl;
 		error = ":localhost 461 PASS :\n";
 		send(fd, error.c_str(), error.length(), 0);
