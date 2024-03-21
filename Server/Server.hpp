@@ -25,9 +25,9 @@ private:
 	int	port; //server port
 	std::string	password; // mot de pass
 	static bool signal; // static boolean pour le signal
-	struct pollfd	poll_fd[11]; // tableau de 11 structures pollfd utilisées pour surveiller 11 files descriptors dont 1 correspond a sockfd
+	std::vector<struct pollfd>	poll_fd; // tableau de 11 structures pollfd utilisées pour surveiller 11 files descriptors dont 1 correspond a sockfd
+	struct pollfd	new_client;
 	int	poll_size;
-	int	poll_num;
 	int	status;
 	int	max_client;
 	int opt_val;
@@ -42,6 +42,6 @@ public:
 	void	checkPoll();
 	void	acceptClient();
 	void	acceptUser(int fd, std::string buff);
-	void	receiveEvent(int i);
+	void	receiveEvent(int fd);
 	static void signalHandler(int signum);
 };

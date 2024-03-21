@@ -32,6 +32,9 @@ void    Server::initServer()
 {
     struct sockaddr_in addr;
 
+	addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = htons(port);
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
     {
@@ -43,9 +46,6 @@ void    Server::initServer()
         std::cerr << "initServer(): sotsockopt() failed." << std::endl;
         exit(EXIT_FAILURE);
     }
-	addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(port);
     if (fcntl(sockfd, F_SETFD, O_NONBLOCK) < 0)
     {
         std::cerr << "initServer(): fcntl() failed." << std::endl;
@@ -56,42 +56,37 @@ void    Server::initServer()
         std::cerr << "initServer(): bind() failed." << std::endl;
         exit(EXIT_FAILURE);
     }
-	std::cout << "Passive socket = " << sockfd << std::endl;
 	if (listen(sockfd, 3) < 0)
 	{
 		std::cerr << "initServer(): listen() failed." << std::endl;
         exit(EXIT_FAILURE);
 	}
+	std::cout << "Passive socket = " << sockfd << std::endl;
 	addr_len = sizeof(addr);
-    poll_fd[0].fd = sockfd;
-    poll_fd[0].events = POLLIN;
-    poll_fd[0].revents = 0;
-	poll_num = 1;
+    new_client.fd = sockfd;
+    new_client.events = POLLIN;
+    new_client.revents = 0;
+	poll_fd.push_back(new_client);
 }
 
 // boucle qui surveille les activités des files descriptors avec poll()
 void	Server::checkPoll()
 {
+	std::cout << "Waiting to accept a connection...\n";
 	while (Server::signal == false)
 	{
-		status = poll(poll_fd, poll_num, 5000);
+		status = poll(&poll_fd[0], poll_fd.size(), -1);
 		if (status < 0 && Server::signal == false)
-			break;
-		else if (status == 0)
+			throw(std::runtime_error("poll() failed"));
+		for (size_t i = 0; i < poll_fd.size(); i++)
 		{
-			std::cout << "Waiting for connection..." << std::endl;
-			continue;
-		}
-		for (int i = 0; i < poll_num; i++)
-		{
-			if ((poll_fd[i].revents & POLLIN) != 1) //verfier si on peut read le socket
+			if (poll_fd[i].revents & POLLIN) //verfier si on peut read le socket
 			{
-				continue;
+				if (poll_fd[i].fd == sockfd)
+					Server::acceptClient();
+				else
+					Server::receiveEvent(poll_fd[i].fd);
 			}
-			if (poll_fd[i].fd == sockfd)
-				Server::acceptClient();
-			else
-				Server::receiveEvent(i);
 		}
 	}
 }
@@ -103,35 +98,35 @@ void 	Server::acceptClient()
 	struct sockaddr_in	client_addr;
  	socklen_t	socklen = sizeof(client_addr);
 
-	cli_sock = accept(sockfd, (sockaddr *) &client_addr, &socklen);
+	cli_sock = accept(sockfd, (sockaddr *)&client_addr, &socklen);
     if (cli_sock == -1)
     {
         std::cerr << "Error: Server::acceptClient(): accept() failed." << std::endl;
 		exit(EXIT_FAILURE);
     }
-
+	if (fcntl(cli_sock, F_SETFL, O_NONBLOCK) == -1)
+	{
+		std::cerr << "Error: Server::acceptClient(): fcntl() failed." << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	// ajoute le fd de cli_sock dans la tableau de structure pollfd a l'indice pollnum
-	poll_fd[poll_num].fd = cli_sock;
-    poll_fd[poll_num].events = POLLIN | POLLOUT;
-	poll_fd[poll_num].revents = 0;
-    poll_num++;
+	new_client.fd = cli_sock;
+    new_client.events = POLLIN | POLLOUT;
+	new_client.revents = 0;
+	poll_fd.push_back(new_client);
 }
 
 // lire les données provenant d'un socket et traite les données lues en fonction du socket expéditeur
-void	Server::receiveEvent(int i)
+void	Server::receiveEvent(int fd)
 {
 	char	buf[1024] = {0}; // array pour stocker les datas recus
-	int	sender_fd;
 	int	bytes_read;
 
-	sender_fd = poll_fd[i].fd;
-	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
+	bytes_read = recv(fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
 	if (bytes_read <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
 	{
-		std::cout << "FD[" << sender_fd << "] disconnected" << std::endl;
-		close(sender_fd);
-		poll_fd[i] = poll_fd[poll_num - 1];
-		poll_num--;
+		std::cout << "FD[" << fd << "] disconnected" << std::endl;
+		close(fd);
 	}
 	else
 	{
@@ -143,17 +138,16 @@ void	Server::receiveEvent(int i)
 		// si le socket expéditeur n'est pas déjà enregistré dans sockclient,
 		// les données lues sont ajoutées au map buffer associé au socket expéditeur,
 		// puis la fonction acceptUser() est appelée pour traiter les données du client
-		if (sockclient.find(sender_fd) == sockclient.end())
+		if (sockclient.find(fd) == sockclient.end())
 		{
-			std::cout << "FD[" << poll_fd[i].fd << "] connected" << std::endl;
-			buffer[sender_fd] += buf;
-			Server::acceptUser(sender_fd, buffer[sender_fd]);
+			buffer[fd] += buf;
+			Server::acceptUser(fd, buffer[fd]);
 		}
 		// sinon, les données lues sont ajoutées au map buffer,
 		// puis on traite les commandes
 		else
 		{
-			buffer[sender_fd] += buf;
+			buffer[fd] += buf;
 			// traiter les commandes
 		}
 	}
@@ -165,7 +159,7 @@ void	Server::receiveEvent(int i)
 // et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
 void	Server::acceptUser(int fd, std::string buff)
 {
-	// std::cout << "buff:\n" << buff << std::endl;
+	std::cout << "buff:\n" << buff << std::endl;
 
 	std::string	cap_ls;
 	std::string pass;
@@ -195,8 +189,8 @@ void	Server::acceptUser(int fd, std::string buff)
 	// vérifie si le mot de passe est correcte
 	if (pass.compare(this->password) != 0)
 	{
-		// std::cout << "pass: " << pass << std::endl;
-		// std::cout << "password: " << this->password << std::endl;
+		std::cout << "pass: " << pass << std::endl;
+		std::cout << "password: " << this->password << std::endl;
 		std::cout << "Wrong password" << std::endl;
 		error = ":localhost 461 PASS :\n";
 		send(fd, error.c_str(), error.length(), 0);
