@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
@@ -23,6 +24,7 @@ class User;
 class Server
 {
 private:
+
 	int	sockfd;
 	int	port;
 	std::string	password;
@@ -36,7 +38,10 @@ private:
 	std::vector<struct pollfd>	poll_fd;
 	std::vector<User>	sockclient;
 	std::map<int, std::string>	buffer;
+	int	(Server::*parse[8])(std::string split_mess[3]);
+
 public:
+
 	Server(char **argv);
 	Server(Server const &obj);
 	Server &operator=(Server const &obj);
@@ -60,7 +65,7 @@ public:
 	void	removeClientUser(int fd);
 	void	removeFd(int fd);
 
-	// Methods
+	// ServerInit Methods
 	void	initServer();
 	void	checkPoll();
 	void	acceptClient();
@@ -68,4 +73,18 @@ public:
 	void	receiveEvent(int fd);
 	void	closeFd();
 	static void	signalHandler(int signum);
+
+	// ServerParsing Methods
+	int	splitMessage( std::string message, std::string split_mess[3] );
+	int	splitParams( std::string params, std::string split_params[3] );
+	int	parseNick( std::string split_mess[3] );
+	int	parseUser( std::string split_mess[3] );
+	int	parseJoin( std::string split_mess[3] );
+	int	parsePrivmsg( std::string split_mess[3] );
+	int	parseTopic( std::string split_mess[3] );
+	int	parseMode( std::string split_mess[3] );
+	int	parseKick( std::string split_mess[3] );
+	int	parseInvite( std::string split_mess[3] );
+	int8_t	parseCommand( std::string command );
+	int	parseMessage( std::string message );
 };
