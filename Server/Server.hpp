@@ -30,6 +30,8 @@ private:
 	int	poll_num;
 	int	status;
 	int	max_client;
+	int opt_val;
+	int	addr_len;
 	std::map<int, User*>	sockclient;
 	std::map<int, std::string>	buffer;
 public:
