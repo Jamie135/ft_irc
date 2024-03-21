@@ -5,7 +5,10 @@ CPPFLAGS = -std=c++98
 
 SRCS =	main.cpp \
 		Server/Server.cpp \
-		Client/Client.cpp
+		Server/ServerInit.cpp \
+		Server/ServerParsing.cpp \
+		User/User.cpp \
+		Channel/Channel.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
