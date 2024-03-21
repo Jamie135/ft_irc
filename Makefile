@@ -5,6 +5,7 @@ CPPFLAGS = -std=c++98
 
 SRCS =	main.cpp \
 		Server/Server.cpp \
+		Server/ServerInit.cpp \
 		User/User.cpp \
 		Channel/Channel.cpp
 
