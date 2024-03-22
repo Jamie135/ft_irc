@@ -102,7 +102,7 @@ void	Server::removeClientUser(int fd){
 	}
 }
 
-void Server::removeFd(int fd){
+void	Server::removeFd(int fd){
 	for (size_t i = 0; i < this->poll_fd.size(); i++)
 	{
 		if (this->poll_fd[i].fd == fd)
@@ -111,4 +111,11 @@ void Server::removeFd(int fd){
 			return;
 		}
 	}
+}
+
+void	Server::sendMessage(std::string message, int fd)
+{
+	std::cout << ">> " << message;
+	if (send(fd, message.c_str(), message.size(), 0) == -1)
+		std::cerr << "send() failed" << std::endl;
 }

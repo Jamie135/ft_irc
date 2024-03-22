@@ -19,6 +19,7 @@
 #include <poll.h> // for poll()
 #include <csignal> // for signal()
 #include "../User/User.hpp"
+#include "Message.hpp"
 
 class User;
 
@@ -65,6 +66,9 @@ public:
 	// Removers
 	void	removeClientUser(int fd);
 	void	removeFd(int fd);
+
+	// Send Methods
+	void	sendMessage(std::string message, int fd);
 
 	// ServerInit Methods
 	void	initServer();

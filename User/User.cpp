@@ -7,6 +7,7 @@ User::User()
     this->user = "";
     this->ip = "";
     this->buffer = "";
+    this->registered = false;
 }
 
 User::User(int fd, std::string nickname, std::string user): fdUser(fd), nickname(nickname), user(user)
@@ -26,6 +27,7 @@ User &User::operator=(User const &obj)
         this->user = obj.user;
         this->ip = obj.ip;
         this->buffer = obj.buffer;
+        this->registered = obj.registered;
     }
     return *this;
 }
@@ -58,6 +60,11 @@ std::string User::getBuffer()
     return (buffer);
 }
 
+bool    User::getRegistered()
+{
+    return (registered);
+}
+
 void    User::setFduser(int fd)
 {
     this->fdUser = fd;
@@ -86,4 +93,9 @@ void    User::setBuffer(std::string recv)
 void    User::removeBuffer()
 {
     buffer.clear();
+}
+
+void    User::setRegistered(bool val)
+{
+    registered = val;
 }

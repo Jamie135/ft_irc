@@ -25,6 +25,7 @@ private:
 	std::string	user;
 	std::string ip;
 	std::string buffer;
+	bool	registered;
 public:
 	User();
 	User(int fd, std::string nickname, std::string user);
@@ -37,12 +38,14 @@ public:
 	std::string	getUser();
 	std::string	getIp();
 	std::string	getBuffer();
+	bool	getRegistered();
 
 	void	setFduser(int fd);
 	void	setNickname(std::string &nickname);
 	void	setUser(std::string &user);
 	void	setIp(std::string ip);
 	void	setBuffer(std::string recv);
+	void	setRegistered(bool val);
 
 	void	removeBuffer();
 };
