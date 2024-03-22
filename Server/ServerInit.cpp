@@ -99,12 +99,14 @@ void 	Server::acceptClient()
 void	Server::receiveEvent(int fd)
 {
 	User	*client;
-	char	buf[1024] = {0}; // array pour stocker les datas recus
-	int	bytes_read;
+	char	buf[1024]; // array pour stocker les datas recus
+	int	bytes;
+	std::vector<std::string> command;
 
 	client = getClientFduser(fd);
-	bytes_read = recv(fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
-	if (bytes_read <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
+	memset(buf, 0, sizeof(buf));
+	bytes = recv(fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
+	if (bytes <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
 	{
 		std::cout << "FD[" << fd << "] disconnected" << std::endl;
 		removeClientUser(fd);
@@ -117,6 +119,14 @@ void	Server::receiveEvent(int fd)
 		// std::cout << "buf:\n" << buf << std::endl;
 		if (client->getBuffer().find_first_of("\r\n") == std::string::npos)
 			return ;
+		command = splitBuffer(client->getBuffer());
+		for (size_t i = 0; i < command.size(); i++)
+		{
+			// std::cout << "command[" << i << "]: " << command[i] << std::endl;
+			this->parseCommandList(command[i], fd);
+		}
+		if (getClientFduser(fd)) // clear le buffer si le user existe toujours
+			getClientFduser(fd)->removeBuffer();
 	}
 }
 
@@ -136,6 +146,6 @@ void	Server::closeFd()
 void	Server::signalHandler(int signum)
 {
 	(void)signum; // evite l'avertissement "unused parameter"
-	std::cout << std::endl << "Signal Received!" << std::endl;
+	std::cout << " signal received!" << std::endl;
 	Server::signal = true; // arreter le serveur
 }

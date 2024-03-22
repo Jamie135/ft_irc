@@ -7,6 +7,7 @@ SRCS =	main.cpp \
 		Server/Server.cpp \
 		Server/ServerInit.cpp \
 		Server/ServerParsing.cpp \
+		Server/ServerCommand.cpp \
 		User/User.cpp \
 		Channel/Channel.cpp
 
