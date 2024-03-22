@@ -7,9 +7,11 @@ SRCS =	main.cpp \
 		Server/Server.cpp \
 		Server/ServerInit.cpp \
 		Server/ServerParsing.cpp \
-		Server/ServerCommand.cpp \
 		User/User.cpp \
-		Channel/Channel.cpp
+		Channel/Channel.cpp \
+		Command/PASS.cpp \
+		Command/NICK.cpp \
+		Command/USER.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
