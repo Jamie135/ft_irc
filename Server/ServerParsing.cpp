@@ -692,4 +692,6 @@ void	Server::parseCommandList(std::string &message, int fd)
 		PASS(message, fd);
 	else if (command[1] == "NICK" || command[1] == "nick")
 		NICK(message, fd);
+	else if (command[1] == "USER" || command[1] == "user")
+		USER(message, fd);
 }

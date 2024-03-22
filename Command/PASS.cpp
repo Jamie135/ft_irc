@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../Server/Server.hpp"
 
 void	Server::PASS(std::string message, int fd)
 {
@@ -17,7 +17,7 @@ void	Server::PASS(std::string message, int fd)
 			message.erase(message.begin());
 	}
 	if (message.empty() || nonspace == std::string::npos)
-		sendMessage(ERR_NEEDMOREPARAMS(std::string("*")), fd);
+		sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), message), fd);
 	else if (!user->getRegistered())
 	{
 		pass = message;
@@ -28,9 +28,4 @@ void	Server::PASS(std::string message, int fd)
 	}
 	else
 		sendMessage(ERR_ALREADYREGISTERED(getClientFduser(fd)->getNickname()), fd);
-}
-
-void	Server::NICK(std::string message, int fd)
-{
-	std::cout << "NICK\nfd: " << fd << " ; message: " << message << std::endl;
 }

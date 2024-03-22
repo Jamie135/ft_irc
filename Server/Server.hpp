@@ -19,7 +19,7 @@
 #include <poll.h> // for poll()
 #include <csignal> // for signal()
 #include "../User/User.hpp"
-#include "Message.hpp"
+#include "../Command/Message.hpp"
 
 class User;
 
@@ -95,7 +95,10 @@ public:
 	std::vector<std::string>	splitBuffer(std::string buffer);
 	void	parseCommandList(std::string &command, int fd);
 
-	// ServerCommand Methods
+	// Command Methods
 	void	PASS(std::string message, int fd);
 	void	NICK(std::string message, int fd);
+	bool	usedNickname(std::string &nickname);
+	bool	validNickname(std::string &nickname);
+	void	USER(std::string &message, int fd);
 };
