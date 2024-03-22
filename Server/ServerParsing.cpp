@@ -507,7 +507,7 @@ int	Server::splitMessage( std::string message, std::string split_mess[3] )
 	}
 
 	s_tmp = message.substr(i, message.find_first_of(" ", i) - i);
-	std::cout << "command == [" << s_tmp << "]" << std::endl;
+	// std::cout << "command == [" << s_tmp << "]" << std::endl;
 	split_mess[1] = s_tmp;
 	goToNextSpace(message, &i);
 	i += (1 & (message[i] == ' '));
@@ -524,21 +524,59 @@ int	Server::splitMessage( std::string message, std::string split_mess[3] )
 	return (0);
 }
 
-int	Server::parseMessage( std::string message )
+std::vector<std::string>	Server::parseMessage( std::string &message )
 {
-	std::cout << "Dans parseMessage()" << std::endl;
-	std::cout << "\tmessage: [" << message << "]" << std::endl;
+	// std::cout << "Dans parseMessage()" << std::endl;
+	// std::cout << "\tmessage: [" << message << "]" << std::endl;
+	std::vector<std::string>	cmd;
     std::string split_mess[3] = {std::string(), std::string(), std::string()}; // [0]: prefix, [1]:command, [2]: params
 
 	splitMessage(message, split_mess);
 
 	// std::cout << "splitmessage[0] == [" << split_mess[0] << "]" << std::endl;
 	// std::cout << "splitmessage[1] == [" << split_mess[1] << "]" << std::endl;
-	std::cout << "splitmessage[2] == [" << split_mess[2] << "]" << std::endl;
+	// std::cout << "splitmessage[2] == [" << split_mess[2] << "]" << std::endl;
+	for (size_t i = 0; i < 3; i++)
+	{
+		cmd.push_back(split_mess[i]);
+	}
+	return (cmd);
+}
 
-	int8_t	cmd = parseCommand(split_mess[1]);
-	if (cmd == -1)
-		return (1);
-	
-	return ( (this->*parse[cmd])(split_mess) == 1 );
+// separer le buffer en lignes individuelles et stocker chaque ligne dans le vecteur cmd
+std::vector<std::string>	Server::splitBuffer(std::string buffer)
+{
+	std::vector<std::string>	cmd;
+	std::istringstream	stm(buffer); // créer un flux de chaînes de caractères à partir de la chaîne buffer pour lire avec getLine
+	std::string	line;
+	size_t	end;
+
+	while (std::getline(stm, line))
+	{
+		end = line.find_first_of("\r\n");
+		if (end != std::string::npos)
+			line = line.substr(0, end);
+		// std::cout << "line: " << line << std::endl;
+		cmd.push_back(line);
+	}
+	return (cmd);
+}
+
+void	Server::parseCommandList(std::string &message, int fd)
+{
+	// std::cout << "fd: " << fd << " ; message: " << message << std::endl;
+
+	std::vector<std::string>	command;
+
+	if (message.empty())
+		return ;
+	command = parseMessage(message);
+	// for(size_t i = 0; i < command.size(); i++)
+	// {
+	// 	std::cout << "command[" << i << "]: " << command[i] << std::endl;
+	// }
+	if (command[1] == "PASS" || command[1] == "pass")
+		PASS(message, fd);
+	else if (command[1] == "NICK" || command[1] == "nick")
+		NICK(message, fd);
 }

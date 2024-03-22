@@ -82,3 +82,8 @@ void    User::setBuffer(std::string recv)
 {
     buffer += recv;
 }
+
+void    User::removeBuffer()
+{
+    buffer.clear();
+}
