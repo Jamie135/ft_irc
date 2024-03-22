@@ -13,9 +13,14 @@
 #include <arpa/inet.h> // for inet_ntoa()
 #include <poll.h> // for poll()
 #include <csignal> // for signal()
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "../Client/Client.hpp"
+
+#define GRN "\e[0;32m"
+#define WHT "\e[0;37m"
+#define RED "\e[0;31m"
 
 class Server
 {

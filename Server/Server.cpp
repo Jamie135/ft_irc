@@ -1,7 +1,8 @@
 #include "Server.hpp"
 
-Server::Server(char **argv): port(atoi(argv[1])), pass(argv[2])
+Server::Server(char **argv): port(0), pass("")
 {
+	( void ) argv;
 	socklen = sizeof(addr);
 
 	parse[0] = &Server::parseNick;
