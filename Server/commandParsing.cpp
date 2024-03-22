@@ -11,25 +11,29 @@ void	goToNextSpace( std::string s, size_t *i )
 
 int	Server::splitParams( std::string params, std::string splitParams[3] )
 {
+	std::cout << "-----------------------------" << std::endl;
+	std::cout << "> In splitParams()" << std::endl;
 	size_t	i = 0;
 	size_t	k = 0;
-	for (int8_t j = 0; i <= params.length() && j < 3; j++)
+	for (int8_t j = 0; i < params.length() && j < 3; j++)
 	{
-		std::cout << ">> j == " << j << std::endl;
+		// std::cout << ">> j == " << j << std::endl;
 		k = i;
 		i = params.find_first_of(" ", k);
 		if (i == std::string::npos)
 		{
 			splitParams[j] = params.substr(k);
+			break ;
 		}
 		else if (i < params.length())
 		{
-			splitParams[j] = params.substr(k, i);
+			splitParams[j] = params.substr(k, i - k);
 		}
 		std::cout << "splitParams[" << (int)j << "] == [" << splitParams[j] << "]" << std::endl;
-		std::cout << "i += " << (1 & (params[i] == ' ')) << std::endl;
+		// std::cout << "i += " << (1 & (params[i] == ' ')) << std::endl;
 		i += (1 & (params[i] == ' '));
 	}
+	std::cout << "-----------------------------" << std::endl;
 	return (0);
 }
 
@@ -71,7 +75,13 @@ int	Server::parseNick( std::string split_mess[3] )
 			Check if requesting user exists.
 			Check if the new nickname is not already in use
 		*/
-	}	
+	}
+	else // A new nickname is requested
+	{
+		/*
+			Check if nickname requested is available
+		*/
+	}
 	return (0);
 }
 
@@ -104,6 +114,30 @@ int	Server::parseJoin( std::string split_mess[3] )
 		std::cerr << "Error: parseJoin(): parameters can't be empty." << std::endl;
 		return (1);
 	}
+
+	std::string split_params[3] = {std::string(), std::string(), std::string()};
+	if (splitParams(split_mess[2], split_params) == 1)
+	{
+		return (1);
+	}
+
+	if (split_params[0].empty() == 1)	
+	{
+		std::cerr << "Error: parseJoin(): need more params.(no parameters given)" << std::endl;
+		return (1);
+	}
+	/*
+		if ( channel requires a key )
+			check if split_params[1].empty() == 0
+		check if channel is invite only
+		check if channel is full
+		check if channel exists
+		check if user is banned form channel
+		check if user is concerned by the ban mask
+		check if key is correct
+		check if the user joined a limit number of channels
+	*/
+	
 	// Check for doc to see all other errors
 	return (0);
 }
@@ -156,11 +190,13 @@ int	Server::parseKick( std::string split_mess[3] )
 		return (1);
 	}
 	std::string split_params[3] = {std::string(), std::string(), std::string()};
-
 	if (splitParams(split_mess[2], split_params) == 1)
 	{
 		return (1);
 	}
+	std::cout << "Split_params[0] == [" << split_params[0] << "]" << std::endl;
+	std::cout << "Split_params[1] == [" << split_params[1] << "]" << std::endl;
+	std::cout << "Split_params[2] == [" << split_params[2] << "]" << std::endl;
 	
 	if (split_params[0].empty() == 0 && split_params[1].empty() == 1)
 	{
@@ -251,25 +287,30 @@ int	Server::parseTopic( std::string split_mess[3] )
 		return (1);
 	}
 
+	std::cout << "Split_params[0] == [" << split_params[0] << "]" << std::endl;
+	std::cout << "Split_params[1] == [" << split_params[1] << "]" << std::endl;
+	std::cout << "Split_params[2] == [" << split_params[2] << "]" << std::endl;
 	if (split_params[0].empty() == 0)
 	{
 		if (split_mess[1].empty() == 1)
 		{
-			if (split_params[0][0] != '#')
+			if (split_params[0][0] != '#' && split_params[0][0] != '&')
 			{
-				std::cerr << "Error: parseTopic(): invalid arguments." << std::endl;
+				std::cerr << "Error: parseTopic(): invalid arguments.(First arg is not a channel)" << std::endl;
+				return (1);
 			}
-			//	check the topic
 			/*
+				check the topic
 				Check if a topic is set
+				return the topic "<channel> :<topic>"
 			*/
-			// return the topic "<channel> :<topic>"
 		}
 		else
 		{
-			if (split_mess[1][0] != ':')
+			if (split_params[1].empty() == 0 && split_params[1][0] != ':')
 			{
-				std::cerr << "Error: parseTopic(): invalid arguments." << std::endl;
+				std::cerr << "Error: parseTopic(): invalid arguments.(no trailing argument)" << std::endl;
+				return (1);
 			}
 			/*
 				Check if channel exists
@@ -332,46 +373,76 @@ int	Server::parseMode( std::string split_mess[3] )
 	{
 		return (1);
 	}
+	std::cout << "Split_params[0] == [" << split_params[0] << "]" << std::endl;
+	std::cout << "Split_params[1] == [" << split_params[1] << "]" << std::endl;
+	std::cout << "Split_params[2] == [" << split_params[2] << "]" << std::endl;
+	if (split_params[1].find_first_not_of("+-opsitnmlbvkws") != std::string::npos)
+	{
+		std::cerr << "Error: parseMode(): invalid parameters.(option)" << std::endl;
+		return (1);
+	}
+	else if (split_params[1][0] != '+' && split_params[1][0] != '-')
+	{
+		std::cerr << "Error: parseMode(): invalid parameters.(+|-)" << std::endl;
+		return (1);
+	}
+	else if (split_mess[0].empty() == 0 && split_mess[0][0] != ':')
+	{
+		std::cerr << "Error: parseMode(): invalid prefix." << std::endl;
+		return (1);
+	}
 
 	if (split_params[0][0] == '#' || split_params[0][0] == '&')
 	{
-		// Check if mode option valid
-		if (split_params[1][0] != '+' && split_params[1][0] != '-')
+				//	Channel mode
+		/*
+			Check if channel name valid
+			Check if channel name exists
+			Check if channel name is associated with the right symbol (#|&)
+		*/
+		if (split_params[1].find_first_not_of("+-opsitnmlbvk") != std::string::npos)
 		{
-			std::cerr << "Error: parseMode(): invalid parameters.(+|-)" << std::endl;
+			std::cerr << "Error: parseMode(): invalid option.(channel mode wrong option)" << std::endl;
 			return (1);
 		}
-		else if (split_params[2].find_first_not_of("+-opsitnbv") != std::string::npos)
-		{
-			std::cerr << "Error: parseMode(): invalid parameters.(option)" << std::endl;
-			return (1);
-		}
-		else if (split_params[2].find_first_not_of("ovklb") != std::string::npos)
+
+		if (split_params[1].find_first_of("olvk") != std::string::npos)
 		{
 			//	Checks for MODE #channel [+|-]opt
-			if (split_params[1].empty() == 1)
+			if (split_params[2].empty() == 1)
 			{
 				std::cerr << "Error: parseMode(): invalid argument.(ovkl No arguments)" << std::endl;
 				return (1);
 			}
-			//	Add more tests for 'b' opt
-			//	Add more tests for arguments validity
+
 		}
-		else if (split_params[2].find_first_not_of("+-iwso") != std::string::npos)
+		else if (split_params[1].find_first_of("psitnm") != std::string::npos)
 		{
-			if (split_params[1].empty() == 1)
+			if (split_params[2].empty() == 0)
 			{
-				std::cerr << "Error: parseMode(): invalid argument.(psitnm has argument)" << std::endl;
+				std::cerr << "Error: parseMode(): channel mode has wrong options." << std::endl;
 				return (1);
 			}
-			// Add test for combinaison :sender <argument> compatibility
-			//	Add special tests for arguments validity
 		}
 	}
 	else
 	{
-		if (split_params[0].compare("MODE") == 0)
-		{}
+		if (split_params[2].find_first_not_of("+-iwso") != std::string::npos)
+		{
+			if (split_mess[2].empty() == 1 || split_params[0].empty() == 1 || split_params[1].empty() == 1)
+			{
+				std::cerr << "Error: parseMode(): need more argument.(user mode need argument)" << std::endl;
+				return (1);
+			}
+			else
+			{
+				if (split_mess[0].compare(":" + split_params[0]) != 0)
+				{
+					std::cerr << "Error: parseMode(): invalid argument.(:sender != <nickname>)" << std::endl;
+					return (1);
+				}
+			}
+		}
 		else
 		{
 			/*
@@ -399,11 +470,12 @@ int8_t	Server::parseCommand( std::string command )
 	*/
 	(void) command;
 
-	std::string cmds[] = {"NICK", "USER", "JOIN", "PRIVMSG", "TOPIC", "MODE", "KICK", "INVITE"};
+	// std::string cmds[] = {"NICK", "USER", "JOIN", "PRIVMSG", "TOPIC", "MODE", "KICK", "INVITE"};
+	char cmds[] = {'N', 'U', 'J', 'P', 'T', 'M', 'K', 'I'};
 
 	for (int8_t i = 0; i < 8; i++)
 	{
-		if (command[0] == cmds[i][0])
+		if (command[0] == cmds[i])
 		{
 			return (i);
 		}
@@ -432,7 +504,7 @@ int	Server::splitMessage( std::string message, std::string split_mess[3] )
 	}
 	else
 	{
-		split_mess[0] = std::string("");
+		split_mess[0] = std::string();
 	}
 
 	s_tmp = message.substr(i, message.find_first_of(" ", i) - i);
@@ -448,7 +520,6 @@ int	Server::splitMessage( std::string message, std::string split_mess[3] )
 	else
 	{
 		s_tmp = message.substr(i);
-		std::cout << "params == [" << s_tmp << "]" << std::endl;
 		split_mess[2].append(s_tmp);
 	}
 	return (0);
@@ -462,8 +533,8 @@ int	Server::parseMessage( std::string message )
 
 	splitMessage(message, split_mess);
 
-	std::cout << "splitmessage[0] == [" << split_mess[0] << "]" << std::endl;
-	std::cout << "splitmessage[1] == [" << split_mess[1] << "]" << std::endl;
+	// std::cout << "splitmessage[0] == [" << split_mess[0] << "]" << std::endl;
+	// std::cout << "splitmessage[1] == [" << split_mess[1] << "]" << std::endl;
 	std::cout << "splitmessage[2] == [" << split_mess[2] << "]" << std::endl;
 
 	int8_t	cmd = parseCommand(split_mess[1]);
