@@ -35,7 +35,7 @@ void    Server::initServer()
 		std::cerr << "initServer(): listen() failed." << std::endl;
         exit(EXIT_FAILURE);
 	}
-	std::cout << "Passive socket = " << sockfd << std::endl;
+	std::cout << "Passive socket: FD[" << sockfd << "]" << std::endl;
 	addr_len = sizeof(addr);
     new_client.fd = sockfd;
     new_client.events = POLLIN;
@@ -46,7 +46,7 @@ void    Server::initServer()
 // boucle qui surveille les activités des files descriptors avec poll()
 void	Server::checkPoll()
 {
-	std::cout << "Waiting to accept a connection...\n";
+	std::cout << "Waiting for a connection...\n";
 	while (Server::signal == false)
 	{
 		status = poll(&poll_fd[0], poll_fd.size(), -1);

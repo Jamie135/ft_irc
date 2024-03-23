@@ -19,9 +19,11 @@
 #include <poll.h> // for poll()
 #include <csignal> // for signal()
 #include "../User/User.hpp"
+#include "../Channel/Channel.hpp"
 #include "../Command/Message.hpp"
 
 class User;
+class Channel;
 
 class Server
 {
@@ -39,6 +41,7 @@ private:
 	struct pollfd	new_client;
 	std::vector<struct pollfd>	poll_fd;
 	std::vector<User>	sockclient;
+	std::vector<Channel>	channel;
 	std::map<int, std::string>	buffer;
 	int	(Server::*parse[8])(std::string split_mess[3]);
 
@@ -102,4 +105,5 @@ public:
 	bool	usedNickname(std::string &nickname);
 	bool	validNickname(std::string &nickname);
 	void	USER(std::string &message, int fd);
+	void	QUIT(std::string message, int fd);
 };

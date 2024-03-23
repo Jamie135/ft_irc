@@ -11,7 +11,8 @@ SRCS =	main.cpp \
 		Channel/Channel.cpp \
 		Command/PASS.cpp \
 		Command/NICK.cpp \
-		Command/USER.cpp
+		Command/USER.cpp \
+		Command/QUIT.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

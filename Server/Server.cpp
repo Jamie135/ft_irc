@@ -2,7 +2,7 @@
 
 Server::Server(char **argv)
 {
-	std::cout << "Server constructed" << std::endl;
+	std::cout << "---------- FT_IRC SERVER ----------" << std::endl;
 	this->sockfd = -1;
 	port = atoi(argv[1]);
 	password = argv[2];
