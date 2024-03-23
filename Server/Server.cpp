@@ -145,6 +145,7 @@ void	Server::clearChannel(int fd)
 	}
 }
 
+// send() permet d'envoyer des données au socket fd, souvent utilisé pour envoyer des messages provenant de l'execution des commandes
 void	Server::sendMessage(std::string message, int fd)
 {
 	std::cout << ">> " << message;
