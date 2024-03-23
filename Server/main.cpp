@@ -373,12 +373,12 @@ int	main( void )
 	std::cout << std::endl;
 
 	message = std::string("TOPIC #test :topic dnjakc");
-	std::cout << "TOPIC #test :topic dnjakc : ";
-	if (serv.parseMessage(message) == 1)
-		std::cout << GRN << "> OK <" << WHT << std::endl;
-	else
-		std::cout << RED << "> KO <" << WHT << std::endl;
-	std::cout << std::endl;
+	// std::cout << "TOPIC #test :topic dnjakc : ";
+	// if (serv.parseMessage(message) == 1)
+	// 	std::cout << GRN << "> OK <" << WHT << std::endl;
+	// else
+	// 	std::cout << RED << "> KO <" << WHT << std::endl;
+	// std::cout << std::endl;
 	// =========================================================================
 	std::cout << "\t---- MODE ----" << std::endl;
 	message = std::string("MODE #Finnish +im");
@@ -440,6 +440,78 @@ int	main( void )
 	message = std::string("MODE &oulu +b *!*@*.edu");
 	std::cout << "MODE &oulu +b *!*@*.edu : ";
 	if (serv.parseMessage(message) == 0)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE WiZ -w");
+	std::cout << message << " : ";
+	if (serv.parseMessage(message) == 0)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string(":Angel MODE Angel +i");
+	std::cout << message << " : ";
+	if (serv.parseMessage(message) == 0)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE WiZ -o");
+	std::cout << message << " : ";
+	if (serv.parseMessage(message) == 0)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE");
+	std::cout << "MODE : ";
+	if (serv.parseMessage(message) == 1)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE &oulou");
+	std::cout << "MODE &oulou : ";
+	if (serv.parseMessage(message) == 1)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE +s");
+	std::cout << "MODE +s : ";
+	if (serv.parseMessage(message) == 1)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE +soi");
+	std::cout << "MODE +soi : ";
+	if (serv.parseMessage(message) == 1)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE +b *!*@*.edu");
+	std::cout << "MODE +b *!*@*.edu : ";
+	if (serv.parseMessage(message) == 1)
+		std::cout << GRN << "> OK <" << WHT << std::endl;
+	else
+		std::cout << RED << "> KO <" << WHT << std::endl;
+	std::cout << std::endl;
+
+	message = std::string("MODE #42 +k");
+	std::cout << "MODE #42 +k : ";
+	if (serv.parseMessage(message) == 1)
 		std::cout << GRN << "> OK <" << WHT << std::endl;
 	else
 		std::cout << RED << "> KO <" << WHT << std::endl;

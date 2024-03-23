@@ -44,7 +44,11 @@ public:
 	static void signalHandler(int signum); // signal handler
 
 	int	splitMessage( std::string message, std::string split_mess[3] );
-	int	splitParams( std::string params, std::string split_params[3] );
+	bool	splitParams( std::string params, std::string split_params[3] );
+
+	bool	checkOption( std::string opt );
+	bool	checkChannel( std::string ch );
+	bool	checkPrefix( std::string pref );
 
 	int	parseNick( std::string split_mess[3] );
 	int	parseUser( std::string split_mess[3] );

@@ -9,15 +9,12 @@ void	goToNextSpace( std::string s, size_t *i )
 	}
 }
 
-int	Server::splitParams( std::string params, std::string splitParams[3] )
+bool	Server::splitParams( std::string params, std::string splitParams[3] )
 {
-	// std::cout << "-----------------------------" << std::endl;
-	// std::cout << "> In splitParams()" << std::endl;
 	size_t	i = 0;
 	size_t	k = 0;
 	for (int8_t j = 0; i < params.length() && j < 3; j++)
 	{
-		// std::cout << ">> j == " << j << std::endl;
 		k = i;
 		i = params.find_first_of(" ", k);
 		if (i == std::string::npos
@@ -27,36 +24,32 @@ int	Server::splitParams( std::string params, std::string splitParams[3] )
 			break ;
 		}
 		else if (i < params.length())
-		{
 			splitParams[j] = params.substr(k, i - k);
-		}
-		// std::cout << "splitParams[" << (int)j << "] == [" << splitParams[j] << "]" << std::endl;
-		// std::cout << "i += " << (1 & (params[i] == ' ')) << std::endl;
 		i += (1 & (params[i] == ' '));
 	}
-	// std::cout << "-----------------------------" << std::endl;
 	return (0);
 }
 
-// int	Server::parsePass( std::string split_mess[3] )
-// {
-// 	/*
-// 	Example:
-// 		PASS secretpasswordhere
-// 	*/
+bool	Server::checkOption( std::string opt )
+{
+	return (opt.empty() == 1
+	|| (opt[0] != '+' && opt[0] != '-')
+	|| (opt.length() == 1));
+}
 
-// 	if (split_mess[0].empty() == 0)
-// 	{
-// 		std::cerr << "Error: parsePass(): prefix should be empty." << std::endl;
-// 		return (1);
-// 	}
-// 	if (split_mess[2].empty() == 1)
-// 	{
-// 		std::cerr << "Error: parsePass(): parameters should not be empty." << std::endl;
-// 		return (1);
-// 	}
-// 	return (0);
-// }
+bool	Server::checkChannel( std::string ch )
+{
+	return (ch.empty() == 1
+	|| (ch[0] != '#' && ch[0] != '&')
+	|| ch.length() == 1);
+}
+
+bool	Server::checkPrefix( std::string pref )
+{
+	return (pref.empty() == 1
+	|| pref[0] != ':'
+	|| pref.length() == 1);
+}
 
 int	Server::parseNick( std::string split_mess[3] )
 {
@@ -187,19 +180,15 @@ int Server::parsePrivmsg( std::string split_mess[3] )
 	// std::cout << "Split_params[0] == [" << split_params[0] << "]" << std::endl;
 	// std::cout << "Split_params[1] == [" << split_params[1] << "]" << std::endl;
 	// std::cout << "Split_params[2] == [" << split_params[2] << "]" << std::endl;
-	if (split_params[0].empty() == 1)
+	if (checkPrefix(split_params[0]))
 	{
-		std::cerr << "Error: parsePrivmsg(): need more parameters.(no receiver parameters)" << std::endl;
+		std::cerr << "Error: parsePrivmsg(): invalid prefix." << std::endl;
 		return (1);
 	}
-	else
+	else if (split_params[0].find_first_of(".", 0) == std::string::npos)
 	{
-		if ((split_params[0][0] == '#' || split_params[0][0] == '&')
-			&& split_params[0].find_first_of(".", 0) == std::string::npos)
-		{
-			std::cerr << "Error: parsePrivmsg(): receiver parameter syntax error.(must have a '.')" << std::endl;
-			return (1);
-		}
+		std::cerr << "Error: parsePrivmsg(): receiver parameter syntax error.(must have a '.')" << std::endl;
+		return (1);
 	}
 
 	if (split_params[1].empty() == 1)
@@ -252,9 +241,6 @@ int	Server::parseKick( std::string split_mess[3] )
 	{
 		return (1);
 	}
-	std::cout << "Split_params[0] == [" << split_params[0] << "]" << std::endl;
-	std::cout << "Split_params[1] == [" << split_params[1] << "]" << std::endl;
-	std::cout << "Split_params[2] == [" << split_params[2] << "]" << std::endl;
 	
 	if (split_params[0].empty() == 1)
 	{
@@ -363,7 +349,6 @@ int	Server::parseInvite( std::string split_mess[3] )
 
 int	Server::parseTopic( std::string split_mess[3] )
 {
-	std::cout << " T O P I C"  << std::endl;
 	/*
 	Examples:
 		:Wiz TOPIC #test :New topic
@@ -399,14 +384,9 @@ int	Server::parseTopic( std::string split_mess[3] )
 	// std::cout << "Split_params[0] == [" << split_params[0] << "]" << std::endl;
 	// std::cout << "Split_params[1] == [" << split_params[1] << "]" << std::endl;
 	// std::cout << "Split_params[2] == [" << split_params[2] << "]" << std::endl;
-	if (split_params[0][0] != '#' && split_params[0][0] != '&')
+	if (checkChannel(split_params[0]))
 	{
 		std::cerr << "Error: parseTopic(): invalid arguments.(First arg is not a channel)" << std::endl;
-		return (1);
-	}
-	else if (split_params[0].length() < 2)
-	{
-		std::cerr << "parseTopic(): invalid parameters.(channel name == \"#\" or \"&\")" << std::endl;
 		return (1);
 	}
 
@@ -494,7 +474,7 @@ int	Server::parseMode( std::string split_mess[3] )
 		std::cerr << "Error: parseMode(): invalid parameters.(option)" << std::endl;
 		return (1);
 	}
-	else if (split_params[1][0] != '+' && split_params[1][0] != '-')
+	else if (checkOption(split_params[1]))
 	{
 		std::cerr << "Error: parseMode(): invalid parameters.(+|-)" << std::endl;
 		return (1);
@@ -515,7 +495,7 @@ int	Server::parseMode( std::string split_mess[3] )
 		*/
 		if (split_params[1].find_first_not_of("+-opsitnmlbvk") != std::string::npos)
 		{
-			std::cerr << "Error: parseMode(): invalid option.(channel mode wrong option)" << std::endl;
+			std::cerr << "Error: parseMode(): invalid arguments.(channel mode wrong option)" << std::endl;
 			return (1);
 		}
 
@@ -524,7 +504,7 @@ int	Server::parseMode( std::string split_mess[3] )
 			//	Checks for MODE #channel [+|-]opt
 			if (split_params[2].empty() == 1)
 			{
-				std::cerr << "Error: parseMode(): invalid argument.(ovkl No arguments)" << std::endl;
+				std::cerr << "Error: parseMode(): invalid arguments.(ovkl No arguments)" << std::endl;
 				return (1);
 			}
 
@@ -533,7 +513,7 @@ int	Server::parseMode( std::string split_mess[3] )
 		{
 			if (split_params[2].empty() == 0)
 			{
-				std::cerr << "Error: parseMode(): channel mode has wrong options." << std::endl;
+				std::cerr << "Error: parseMode(): invalid arguments.(non-arg options has argument)" << std::endl;
 				return (1);
 			}
 		}
@@ -551,7 +531,7 @@ int	Server::parseMode( std::string split_mess[3] )
 			{
 				if (split_mess[0].compare(":" + split_params[0]) != 0)
 				{
-					std::cerr << "Error: parseMode(): invalid argument.(:sender != <nickname>)" << std::endl;
+					std::cerr << "Error: parseMode(): invalid arguments.(:sender != <nickname>)" << std::endl;
 					return (1);
 				}
 			}
@@ -561,7 +541,6 @@ int	Server::parseMode( std::string split_mess[3] )
 			/*
 				Check if is user exists
 				Check if user is on the channel
-				Check if channel exists
 			*/
 		}
 	}
