@@ -656,6 +656,19 @@ std::vector<std::string>	Server::parseMessage( std::string &message )
 	return (cmd);
 }
 
+std::vector<std::string> Server::splitParam(std::string& message)
+{
+    std::vector<std::string>	param;
+    std::stringstream	ss(message);
+    std::string	line;
+    
+    while (std::getline(ss, line, ' '))
+    {
+        param.push_back(line);
+    }
+    return param;
+}
+
 // separer le buffer en lignes individuelles et stocker chaque ligne dans le vecteur cmd
 std::vector<std::string>	Server::splitBuffer(std::string buffer)
 {

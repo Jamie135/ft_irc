@@ -91,6 +91,7 @@ public:
 	int	parseKick( std::string split_mess[3] );
 	int	parseInvite( std::string split_mess[3] );
 	int8_t	parseCommand( std::string command );
+	std::vector<std::string>	splitParam(std::string &message);
 	std::vector<std::string>	parseMessage( std::string &message );
 	std::vector<std::string>	splitBuffer(std::string buffer);
 	void	parseCommandList(std::string &command, int fd);
