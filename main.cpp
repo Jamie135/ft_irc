@@ -15,22 +15,23 @@
 
 int	main(int argc, char **argv)
 {
+	Server	serv(argv);
+
 	if (argc != 3)
 	{
 		std::cerr << "Error: Syntax must be ./ircserv <port> <password>";
 		return (0);
 	}
-
-	Server	serv(argv);
-	serv.initServer();
-	serv.checkPoll();
 	try
 	{
 		signal(SIGINT, Server::signalHandler);
 		signal(SIGQUIT, Server::signalHandler);
+		serv.initServer();
+		serv.checkPoll();
 	}
 	catch(const std::exception& e)
 	{
+		serv.closeFd();
 		std::cerr << e.what() << std::endl;
 	}
 	return (0);

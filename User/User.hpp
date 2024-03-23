@@ -22,12 +22,33 @@ class User
 private:
 	int	fdUser;
 	std::string	nickname;
-	std::string	name;
+	std::string	user;
+	std::string ip;
+	std::string buffer;
+	bool	registered;
+	bool	connected;
 public:
-	User(int fdNew, std::string const &nicknameNew);
+	User();
+	User(int fd, std::string nickname, std::string user);
+	User(User const &obj);
+	User &operator=(User const &obj);
 	~User();
-	int	getFdUser();
-	std::string const	&getNickName() const;
-	std::string const	&getName() const;
-	void	setName(std::string const &nameNew);
+
+	int	getFduser();
+	std::string	getNickname();
+	std::string	getUser();
+	std::string	getIp();
+	std::string	getBuffer();
+	bool	getRegistered();
+	bool	getConnected();
+
+	void	setFduser(int fd);
+	void	setNickname(std::string &nickname);
+	void	setUser(std::string &user);
+	void	setIp(std::string ip);
+	void	setBuffer(std::string recv);
+	void	setRegistered(bool val);
+	void	setConnected(bool val);
+
+	void	removeBuffer();
 };

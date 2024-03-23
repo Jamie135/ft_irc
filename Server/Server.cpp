@@ -2,219 +2,120 @@
 
 Server::Server(char **argv)
 {
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	std::cout << "Server constructed: Passive Socket == " << sockfd << std::endl;
+	std::cout << "---------- FT_IRC SERVER ----------" << std::endl;
+	this->sockfd = -1;
 	port = atoi(argv[1]);
-	pass = argv[2];
+	password = argv[2];
+	opt_val = 1;
 	poll_size = 10;
+	max_client = 10;
+}
+
+Server::Server(Server const &obj)
+{
+	*this = obj;
+}
+
+Server &Server::operator=(Server const &obj){
+	if (this != &obj)
+	{
+		this->sockfd = obj.sockfd;
+		this->port = obj.port;
+		this->password = obj.password;
+		this->sockclient = obj.sockclient;
+		this->poll_fd = obj.poll_fd;
+	}
+	return *this;
 }
 
 Server::~Server()
+{}
+
+int	Server::getSockfd()
 {
+	return (this->sockfd);
 }
 
-bool	Server::signal = false;
-
-void	Server::signalHandler(int signum)
+int	Server::getPort()
 {
-	(void)signum; // evite l'avertissement "unused parameter"
-	std::cout << std::endl << "Signal Received!" << std::endl;
-	Server::signal = true; // arreter le serveur
+	return (this->port);
 }
 
-void    Server::initServer()
+std::string	Server::getPassword()
 {
-    struct sockaddr_in addr;
+	return (this->password);
+}
 
-    if (sockfd == -1)
-    {
-        std::cerr << "Error: initServer(): socket() failed." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-	(addr).sin_family = AF_INET;
-    (addr).sin_addr.s_addr = INADDR_ANY;
-	(addr).sin_port = htons(port);
-
-    int opt_val = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val)) < 0)
-    {
-        std::cerr << "initServer(): sotsockopt() failed." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    if (fcntl(sockfd, F_SETFD, O_NONBLOCK) < 0)
-    {
-        std::cerr << "initServer(): fcntl() failed." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    if (bind(sockfd, (const struct sockaddr*)&addr, sizeof(const struct sockaddr)) < 0)
-    {
-        std::cerr << "initServer(): bind() failed." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-	if (listen(sockfd, 3) < 0)
+User	*Server::getClientFduser(int fd)
+{
+	for (size_t i = 0; i < sockclient.size(); i++)
 	{
-		std::cerr << "initServer(): listen() failed." << std::endl;
-        exit(EXIT_FAILURE);
+		if (this->sockclient[i].getFduser() == fd)
+			return (&this->sockclient[i]);
 	}
-    poll_fd[0].fd = sockfd;
-    poll_fd[0].events = POLLIN;
-    poll_fd[0].revents = 0;
-	poll_num = 1;
+	return (NULL);
 }
 
-// boucle qui surveille les activités des files descriptors avec poll()
-void	Server::checkPoll()
+User	*Server::getClientNickname(std::string nickname)
 {
-	while (Server::signal == false)
+	for (size_t i = 0; i < sockclient.size(); i++)
 	{
-		status = poll(poll_fd, poll_num, 5000);
-		if (status < 0 && Server::signal == false)
-			break;
-		else if (status == 0)
+		if (this->sockclient[i].getNickname() == nickname)
+			return (&this->sockclient[i]);
+	}
+	return (NULL);
+}
+
+void	Server::setSockfd(int fd)
+{
+	this->sockfd = fd;
+}
+
+void	Server::setPort(int port)
+{
+	this->port = port;
+}
+
+void	Server::setPassword(std::string password)
+{
+	this->password = password;
+}
+
+void	Server::setClientUser(User newuser)
+{
+	this->sockclient.push_back(newuser);
+}
+
+void	Server::setPollfd(pollfd fd)
+{
+	this->poll_fd.push_back(fd);
+}
+
+void	Server::removeClientUser(int fd){
+	for (size_t i = 0; i < this->sockclient.size(); i++)
+	{
+		if (this->sockclient[i].getFduser() == fd)
 		{
-			std::cout << "Waiting for connection..." << std::endl;
-			continue;
-		}
-		for (int i = 0; i < poll_num; i++)
-		{
-			if ((poll_fd[i].revents & POLLIN) != 1) //verfier si on peut read le socket
-			{
-				continue;
-			}
-			std::cout << "Client[" << poll_fd[i].fd << "] Ready" << std::endl;
-			if (poll_fd[i].fd == sockfd)
-				Server::acceptClient();
-			else
-				Server::receiveEvent(i);
-		}
-	}
-}
-
-// accepte une nouvelle connexion entrante sur un sockfd et récupère le fd du nouveau socket créé
-void 	Server::acceptClient()
-{
-	int	cli_sock;
-	struct sockaddr_in	client_addr;
- 	socklen_t	socklen = sizeof(client_addr);
-
-	std::cout << "listening ..." << std::endl;
-	cli_sock = accept(sockfd, (sockaddr *) &client_addr, &socklen);
-    if (cli_sock == -1)
-    {
-        std::cerr << "Error: Server::acceptClient(): accept() failed." << std::endl;
-		exit(EXIT_FAILURE);
-    }
-
-	// ajoute le fd de cli_sock dans la tableau de structure pollfd a l'indice pollnum
-	poll_fd[poll_num].fd = cli_sock;
-    poll_fd[poll_num].events = POLLIN | POLLOUT;
-	poll_fd[poll_num].revents = 0;
-    poll_num++;
-}
-
-// lire les données provenant d'un socket et traite les données lues en fonction du socket expéditeur
-void	Server::receiveEvent(int i)
-{
-	char	buf[1024] = {0}; // array pour stocker les datas recus
-	int	sender_fd;
-	int	bytes_read;
-
-	sender_fd = poll_fd[i].fd;
-	bytes_read = recv(sender_fd, buf, sizeof(buf) - 1, 0); // recevoir les datas du socket connecté et les stocker dans buf
-	if (bytes_read <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
-	{
-		std::cout << "Client[" << sender_fd << "] disconnected" << std::endl;
-		close(sender_fd);
-		poll_fd[i] = poll_fd[poll_num - 1];
-		poll_num--;
-	}
-	else
-	{
-		buf[bytes_read] = 0; // NULL terminated the buffer
-
-		// ici nous allons mettre les codes de traitement des datas recus: 
-		// tels que le parsing, l'authentification, les commandes, etc...
-
-		// si le socket expéditeur n'est pas déjà enregistré dans sockclient,
-		// les données lues sont ajoutées au map buffer associé au socket expéditeur,
-		// puis la fonction acceptUser() est appelée pour traiter les données du client
-		if (sockclient.find(sender_fd) == sockclient.end())
-		{
-			buffer[sender_fd] += buf;
-			Server::acceptUser(sender_fd, buffer[sender_fd]);
-		}
-		// sinon, les données lues sont ajoutées au map buffer,
-		// puis on traite les commandes
-		else
-		{
-			buffer[sender_fd] += buf;
-			// traiter les commandes
-		}
-	}
-}
-
-// cette fonction va traiter les données reçues 
-// lorsqu'un nouvel utilisateur tente de se connecter au serveur, 
-// elle va vérifier les informations fournies par le client 
-// et créer un nouvel utilisateur s'il remplit toutes les conditions nécessaires
-void	Server::acceptUser(int fd, std::string buff)
-{
-	std::string	cap_ls;
-	std::string password;
-	std::string nickname;
-	int	endline;
-
-	std::string	error;
-
-	if (std::count(buff.begin(), buff.end(), '\n') < 3)
-		return;
-	endline = buff.find('\n');
-	cap_ls = buff.substr(0, endline);
-	std::cout << cap_ls << std::endl;
-	buff.erase(0, endline + 1);
-	endline = buff.find('\n');
-	password = buff.substr(0, endline);
-
-	// vérifie si la ligne du mot de passe contient "PASS :"
-	if (password.find("PASS ") == std::string::npos)
-	{
-		std::cout << "Missing password" << std::endl;
-		error = ":localhost 461 PASS :\n";
-		send(fd, error.c_str(), error.length(), 0);
-		buffer[fd] = "";
-		return ;
-	}
-	password = password.substr(5);
-	// vérifie si le mot de passe est correcte
-	if (password.compare(this->pass) != 0)
-	{
-		// std::cout << "password: " << password << std::endl;
-		// std::cout << "pass: " << this->pass << std::endl;
-		std::cout << "Wrong password" << std::endl;
-		error = ":localhost 461 PASS :\n";
-		send(fd, error.c_str(), error.length(), 0);
-		buffer[fd] = "";
-		return ;
-	}
-	buff.erase(0, endline + 1);
-	endline = buff.find('\n');
-	nickname = buff.substr(0, endline);
-	nickname = nickname.substr(5);
-	std::cout << nickname << std::endl;
-
-	// vérifie si le nickname est deja pris
-	for (std::map<int, User*>::iterator it = sockclient.begin(); it != sockclient.end(); it++)
-	{
-		if (it->second->getNickName() == nickname)
-		{
-			error = ":localhost 433 " + nickname + " :\n";
-			send(fd, error.c_str(), error.length(), 0);
-			buffer[fd] = "";
+			this->sockclient.erase(this->sockclient.begin() + i);
 			return ;
 		}
 	}
-	buff.erase(0, endline + 1);
-	sockclient[fd] = new User(fd, nickname);
-	buffer[fd] = "";
+}
+
+void	Server::removeFd(int fd){
+	for (size_t i = 0; i < this->poll_fd.size(); i++)
+	{
+		if (this->poll_fd[i].fd == fd)
+		{
+			this->poll_fd.erase(this->poll_fd.begin() + i);
+			return;
+		}
+	}
+}
+
+void	Server::sendMessage(std::string message, int fd)
+{
+	std::cout << ">> " << message;
+	if (send(fd, message.c_str(), message.size(), 0) == -1)
+		std::cerr << "send() failed" << std::endl;
 }

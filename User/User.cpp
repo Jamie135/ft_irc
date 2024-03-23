@@ -1,30 +1,113 @@
 #include "User.hpp"
 
-User::User(int fdNew, std::string const &nicknameNew)
+User::User()
 {
-    this->fdUser = fdNew;
-    this->nickname = nicknameNew;
+    this->fdUser = -1;
+    this->nickname = "";
+    this->user = "";
+    this->ip = "";
+    this->buffer = "";
+    this->registered = false;
+    this->connected = false;
+}
+
+User::User(int fd, std::string nickname, std::string user): fdUser(fd), nickname(nickname), user(user)
+{}
+
+User::User(User const &obj)
+{
+    *this = obj;
+}
+
+User &User::operator=(User const &obj)
+{
+    if (this != &obj)
+    {
+        this->fdUser = obj.fdUser;
+        this->nickname = obj.nickname;
+        this->user = obj.user;
+        this->ip = obj.ip;
+        this->buffer = obj.buffer;
+        this->registered = obj.registered;
+        this->connected = obj.connected;
+    }
+    return *this;
 }
 
 User::~User()
 {}
 
-int User::getFdUser()
+int User::getFduser()
 {
     return (this->fdUser);
 }
 
-std::string const &User::getNickName() const
+std::string User::getNickname()
 {
     return (this->nickname);
 }
 
-std::string const &User::getName() const
+std::string User::getUser()
 {
-    return (this->name);
+    return (this->user);
 }
 
-void	User::setName(std::string const &nameNew)
+std::string User::getIp()
 {
-	this->name = nameNew;
+    return (ip);
+}
+
+std::string User::getBuffer()
+{
+    return (buffer);
+}
+
+bool    User::getRegistered()
+{
+    return (registered);
+}
+
+bool    User::getConnected()
+{
+    return (this->connected);
+}
+
+void    User::setFduser(int fd)
+{
+    this->fdUser = fd;
+}
+
+void    User::setNickname(std::string &nickname)
+{
+    this->nickname = nickname;
+}
+
+void    User::setUser(std::string &user)
+{
+    this->user = user;
+}
+
+void    User::setIp(std::string ip)
+{
+    this->ip = ip;
+}
+
+void    User::setBuffer(std::string recv)
+{
+    buffer += recv;
+}
+
+void    User::setRegistered(bool val)
+{
+    registered = val;
+}
+
+void    User::setConnected(bool val)
+{
+    this->connected = val;
+}
+
+void    User::removeBuffer()
+{
+    buffer.clear();
 }
