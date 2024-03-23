@@ -109,6 +109,7 @@ void	Server::receiveEvent(int fd)
 	if (bytes <= 0) // recv retourne -1 si le socket est deconnecté, dans ce cas, on enleve le socket dans le tableau poll_fd
 	{
 		std::cout << "FD[" << fd << "] disconnected" << std::endl;
+		clearChannel(fd);
 		removeClientUser(fd);
 		removeFd(fd);
 		close(fd);
@@ -134,6 +135,7 @@ void	Server::closeFd()
 {
 	for (size_t i = 0; i < sockclient.size(); i++)
 	{
+		std::cout << "FD[" << sockfd << "] disconnected" << std::endl;
 		close(sockclient[i].getFduser());
 	}
 	if (sockfd != -1)

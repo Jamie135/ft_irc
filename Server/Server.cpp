@@ -113,6 +113,38 @@ void	Server::removeFd(int fd){
 	}
 }
 
+void	Server::clearChannel(int fd)
+{
+	int	flag;
+	std::string	reply;
+
+	for (size_t i = 0; i < this->channel.size(); i++)
+	{
+		flag = 0;
+		if (channel[i].getUserFd(fd))
+		{
+			channel[i].removeUser(fd);
+			flag = 1;
+		}
+		else if (channel[i].getOpFd(fd))
+		{
+			channel[i].removeOp(fd);
+			flag = 1;
+		}
+		if (channel[i].numClient() == 0)
+		{
+			channel.erase(channel.begin() + i);
+			i--;
+			continue;
+		}
+		if (flag)
+		{
+			reply = ":" + getClientFduser(fd)->getNickname() + "!~" + getClientFduser(fd)->getUser() + "@localhost QUIT Quit\r\n";
+			channel[i].sendAll(reply);
+		}
+	}
+}
+
 void	Server::sendMessage(std::string message, int fd)
 {
 	std::cout << ">> " << message;

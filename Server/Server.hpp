@@ -69,6 +69,7 @@ public:
 	// Removers
 	void	removeClientUser(int fd);
 	void	removeFd(int fd);
+	void	clearChannel(int fd);
 
 	// Send Methods
 	void	sendMessage(std::string message, int fd);
@@ -106,4 +107,6 @@ public:
 	bool	validNickname(std::string &nickname);
 	void	USER(std::string &message, int fd);
 	void	QUIT(std::string message, int fd);
+	std::string	quitReason(std::string message);
+	void	quitFormatReason(std::string message, std::string str, std::string &reason);
 };
