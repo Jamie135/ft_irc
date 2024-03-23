@@ -637,6 +637,8 @@ int	Server::splitMessage( std::string message, std::string split_mess[3] )
 	return (0);
 }
 
+// extraire des informations telles que le préfixe, la commande et les paramètres sous forme de vecteurs
+// ex: message = "USER root root 0 :root" ==> cmd[1] = "USER" ; cmd[2] = "root root 0 :root"
 std::vector<std::string>	Server::parseMessage( std::string &message )
 {
 	// std::cout << "Dans parseMessage()" << std::endl;
@@ -656,6 +658,8 @@ std::vector<std::string>	Server::parseMessage( std::string &message )
 	return (cmd);
 }
 
+// séparer les paramètres de la commande
+// ex: "USER root root 0 :root" ==> param[0] = "USER" ; param[1] = "root" ;  param[2] = "root" ; param[3] = "0" param[4]= ":root"
 std::vector<std::string> Server::splitParam(std::string& message)
 {
     std::vector<std::string>	param;
@@ -669,11 +673,11 @@ std::vector<std::string> Server::splitParam(std::string& message)
     return param;
 }
 
-// separer le buffer en lignes individuelles et stocker chaque ligne dans le vecteur cmd
+// separer le buffer en lignes individuelles de commandes et stocker chaque ligne dans le vecteur cmd
 std::vector<std::string> Server::splitBuffer(std::string buffer)
 {
     std::vector<std::string> cmd;
-    std::istringstream stm(buffer); // Create a string stream from the buffer string to read with getLine
+    std::istringstream stm(buffer); // crée un string stream à partir du buffer pour lire avec getLine
     std::string line;
     size_t end;
 
@@ -681,13 +685,14 @@ std::vector<std::string> Server::splitBuffer(std::string buffer)
     {
         end = line.find_first_of("\r\n");
         if (end != std::string::npos)
-            line.erase(end); // Erase characters instead of using substr
+            line.erase(end);
         // std::cout << "line: " << line << std::endl;
         cmd.push_back(line);
     }
     return cmd;
 }
 
+// analyser les commandes reçues et extraire le nom de la commande pour diriger l'exécution vers les fonctions appropriées
 void	Server::parseCommandList(std::string &message, int fd)
 {
 	// std::cout << "fd: " << fd << " ; message: " << message << std::endl;

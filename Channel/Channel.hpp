@@ -18,10 +18,19 @@ class Channel
 		std::string	getChannelName();
 		std::string	getChanOps();
 		std::string	getTopic();
+		User	*getUserFd(int fd);
+		User	*getOpFd(int fd);
 
 		void	setChannelName(std::string name);
 		void	setChanOps(std::string ops);
 		void	setTopic(std::string topic);
+
+		void	removeUser(int fd);
+		void	removeOp(int fd);
+
+		void	sendAll(std::string reply);
+
+		size_t	numClient();
 
 	private:
 
@@ -30,6 +39,7 @@ class Channel
 		std::string	_topic;
 
 		std::vector<User>	sockclient;
+		std::vector<User>	ops;
 };
 
 #endif
