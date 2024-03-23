@@ -670,22 +670,22 @@ std::vector<std::string> Server::splitParam(std::string& message)
 }
 
 // separer le buffer en lignes individuelles et stocker chaque ligne dans le vecteur cmd
-std::vector<std::string>	Server::splitBuffer(std::string buffer)
+std::vector<std::string> Server::splitBuffer(std::string buffer)
 {
-	std::vector<std::string>	cmd;
-	std::istringstream	stm(buffer); // créer un flux de chaînes de caractères à partir de la chaîne buffer pour lire avec getLine
-	std::string	line;
-	size_t	end;
+    std::vector<std::string> cmd;
+    std::istringstream stm(buffer); // Create a string stream from the buffer string to read with getLine
+    std::string line;
+    size_t end;
 
-	while (std::getline(stm, line))
-	{
-		end = line.find_first_of("\r\n");
-		if (end != std::string::npos)
-			line = line.substr(0, end);
-		// std::cout << "line: " << line << std::endl;
-		cmd.push_back(line);
-	}
-	return (cmd);
+    while (std::getline(stm, line))
+    {
+        end = line.find_first_of("\r\n");
+        if (end != std::string::npos)
+            line.erase(end); // Erase characters instead of using substr
+        // std::cout << "line: " << line << std::endl;
+        cmd.push_back(line);
+    }
+    return cmd;
 }
 
 void	Server::parseCommandList(std::string &message, int fd)
@@ -707,4 +707,6 @@ void	Server::parseCommandList(std::string &message, int fd)
 		NICK(message, fd);
 	else if (command[1] == "USER" || command[1] == "user")
 		USER(message, fd);
+	else if (command[1] == "QUIT" || command[1] == "quit")
+		QUIT(message, fd);
 }

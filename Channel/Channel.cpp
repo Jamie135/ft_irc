@@ -4,9 +4,11 @@
 /* 							CONSTRUCTORS / DESTRUCTORS						  */
 /* ************************************************************************** */
 
-Channel::Channel(std::string channelName, std::string owner) : _channelName(channelName),
-	_chanOps(owner)
+Channel::Channel()
 {
+	this->_channelName = "";
+	this->_chanOps = "";
+	this->_topic = "";
 }
 
 Channel::Channel(Channel const &src)
@@ -26,6 +28,9 @@ Channel	&Channel::operator=(Channel const &rhs)
 {
 	if (this != &rhs)
 	{
+		this->_channelName = rhs._channelName;
+		this->_chanOps = rhs._chanOps;
+		this->_topic = rhs._topic;
 	}
 	return (*this);
 }
@@ -47,4 +52,19 @@ std::string	Channel::getChanOps()
 std::string	Channel::getTopic()
 {
 	return (_topic);
+}
+
+void	Channel::setChannelName(std::string name)
+{
+	this->_channelName = name;
+}
+
+void	Channel::setChanOps(std::string ops)
+{
+	this->_chanOps = ops;
+}
+
+void	Channel::setTopic(std::string topic)
+{
+	this->_topic = topic;
 }
