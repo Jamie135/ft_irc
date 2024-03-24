@@ -31,6 +31,10 @@ class Channel
 		void	sendAll(std::string reply);
 
 		size_t	numClient();
+		void	checkChannelName(std::string channelName);
+		void	addChanOps(User &user);
+		void	addMember(User &user);
+		void	sendMessage(std::string msg, User &author);
 
 	private:
 
@@ -40,6 +44,7 @@ class Channel
 
 		std::vector<User>	sockclient;
 		std::vector<User>	ops;
+		std::vector<std::string> _modes;
 };
 
 #endif

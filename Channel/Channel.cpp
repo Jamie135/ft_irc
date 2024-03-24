@@ -113,6 +113,40 @@ void	Channel::removeOp(int fd)
 	}
 }
 
+void	Channel::addMember(User &user)
+{
+	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		if (*it == user)
+			throw std::runtime_error("User is already member of this channel");
+	}
+	sockclient.push_back(user);
+}
+
+void	Channel::addChanOps(User &user)
+{
+	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
+	{
+		if (*it == user)
+			throw std::runtime_error("User is already operator of this channel");
+	}
+	ops.push_back(user);
+}
+
+void	Channel::checkChannelName(std::string channnelName)
+{
+	if (channnelName.empty() || channnelName.size() < 2)
+		throw std::runtime_error("Incorrect channel name");
+
+	if (channnelName[0] != '&')
+		throw std::runtime_error("Incorrect channel name, it must begin with &");
+	for (size_t i = 0; i < channnelName.size(); ++i)
+	{
+		if (channnelName[i] == ' ' || channnelName[i] == 0x07 || channnelName[i] == ',')
+			throw std::runtime_error("Incorrect channel name");
+	}
+}
+
 size_t	Channel::numClient()
 {
 	size_t	num;
@@ -134,4 +168,10 @@ void	Channel::sendAll(std::string reply)
 		if (send(sockclient[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
 			std::cerr << "send() failed" << std::endl;
 	}
+}
+
+void	Channel::sendMessage(std::string msg, User &author)
+{
+	(void)msg;
+	(void)author;
 }

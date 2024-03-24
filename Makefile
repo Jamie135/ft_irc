@@ -12,7 +12,8 @@ SRCS =	main.cpp \
 		Command/PASS.cpp \
 		Command/NICK.cpp \
 		Command/USER.cpp \
-		Command/QUIT.cpp
+		Command/QUIT.cpp \
+		Command/PING.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
