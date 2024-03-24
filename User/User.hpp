@@ -20,6 +20,7 @@ public:
 	User(int fd, std::string nickname, std::string user);
 	User(User const &obj);
 	User &operator=(User const &obj);
+	bool operator==(User const &rhs);
 	~User();
 
 	int	getFduser();
