@@ -13,7 +13,7 @@ void	Server::USER(std::string &message, int fd)
 	// {
 	// 	std::cout << "param[" << i << "]: " << param[i] << std::endl;
 	// }
-	if (user && param.size() < 6)
+	if (user && param.size() < 5)
 		sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), user->getNickname()), fd);
 	if (!user || !user->getRegistered())
 		sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);

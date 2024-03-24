@@ -121,6 +121,7 @@ size_t	Channel::numClient()
 	return (num);
 }
 
+// envoyer un message à tous les users et opérateurs présents dans le canal
 void	Channel::sendAll(std::string reply)
 {
 	for (size_t i = 0; i < ops.size(); i++)

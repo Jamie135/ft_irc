@@ -714,4 +714,6 @@ void	Server::parseCommandList(std::string &message, int fd)
 		USER(message, fd);
 	else if (command[1] == "QUIT" || command[1] == "quit")
 		QUIT(message, fd);
+	else if (!notRegistered(fd))
+		sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);
 }

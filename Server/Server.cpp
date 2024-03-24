@@ -113,9 +113,12 @@ void	Server::removeFd(int fd){
 	}
 }
 
+// parcourir tous les canaux du serveur 
+// et retirer les users de chaque canal
+// puis supprimer le canal vide
 void	Server::clearChannel(int fd)
 {
-	int	flag;
+	int	flag; // utilisé pour suivre si l'utilisateur a été retiré d'un canal
 	std::string	reply;
 
 	for (size_t i = 0; i < this->channel.size(); i++)
@@ -151,4 +154,11 @@ void	Server::sendMessage(std::string message, int fd)
 	std::cout << ">> " << message;
 	if (send(fd, message.c_str(), message.size(), 0) == -1)
 		std::cerr << "send() failed" << std::endl;
+}
+
+bool	Server::notRegistered(int fd)
+{
+	if (!getClientFduser(fd) || getClientFduser(fd)->getNickname().empty() || getClientFduser(fd)->getUser().empty() || getClientFduser(fd)->getNickname() == "*" || !getClientFduser(fd)->getConnected())
+		return (false);
+	return (true);
 }
