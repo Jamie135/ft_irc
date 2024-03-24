@@ -34,6 +34,13 @@ User &User::operator=(User const &obj)
     return *this;
 }
 
+bool User::operator==(User const &rhs)
+{
+    if (this->nickname == rhs.nickname)
+        return (true);
+    return (false);
+}
+
 User::~User()
 {}
 
