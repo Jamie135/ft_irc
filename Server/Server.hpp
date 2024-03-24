@@ -74,6 +74,9 @@ public:
 	// Send Methods
 	void	sendMessage(std::string message, int fd);
 
+	// Utils Methods
+	bool	notRegistered(int fd);
+
 	// ServerInit Methods
 	void	initServer();
 	void	checkPoll();
