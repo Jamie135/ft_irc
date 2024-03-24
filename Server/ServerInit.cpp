@@ -54,8 +54,8 @@ void	Server::checkPoll()
 	std::cout << "Waiting for a connection...\n";
 	while (Server::signal == false)
 	{
-		// poll attend qu'un événement se produise sur les fd, -1 permet de bloquer les fds tant qu'on ait aucun événement
-		status = poll(&poll_fd[0], poll_fd.size(), -1);
+		// poll attend qu'un événement se produise sur les fd
+		status = poll(&poll_fd[0], poll_fd.size(), 5000);
 		if (status < 0 && Server::signal == false)
 			throw(std::runtime_error("poll() failed"));
 		for (size_t i = 0; i < poll_fd.size(); i++)
@@ -129,7 +129,7 @@ void	Server::receiveEvent(int fd)
 		command = splitBuffer(client->getBuffer());
 		for (size_t i = 0; i < command.size(); i++)
 		{
-			// std::cout << "command[" << i << "]: " << command[i] << std::endl;
+			std::cout << "<< " << command[i] << std::endl;
 			this->parseCommandList(command[i], fd);
 		}
 		if (getClientFduser(fd)) // supprimer le buffer s'il existe toujours un user

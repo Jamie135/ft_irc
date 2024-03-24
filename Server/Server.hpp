@@ -112,4 +112,5 @@ public:
 	void	QUIT(std::string message, int fd);
 	std::string	quitReason(std::string message);
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);
+	void	PING(std::string &message, int fd);
 };
