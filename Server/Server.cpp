@@ -156,7 +156,7 @@ void	Server::sendMessage(std::string message, int fd)
 		std::cerr << "send() failed" << std::endl;
 }
 
-bool	Server::notRegistered(int fd)
+bool	Server::isRegistered(int fd)
 {
 	if (!getClientFduser(fd) || getClientFduser(fd)->getNickname().empty() || getClientFduser(fd)->getUser().empty() || getClientFduser(fd)->getNickname() == "*" || !getClientFduser(fd)->getConnected())
 		return (false);

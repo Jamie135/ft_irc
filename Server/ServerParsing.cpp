@@ -716,6 +716,11 @@ void	Server::parseCommandList(std::string &message, int fd)
 		QUIT(message, fd);
 	else if (command[1] == "PING" || command[1] == "ping")
 		PING(message, fd);
-	// else if (!notRegistered(fd))
+	else if (isRegistered(fd))
+	{
+		if (command[1] == "JOIN" || command[1] == "join")
+			JOIN(message, fd);
+	}
+	// else if (!isRegistered(fd))
 	// 	sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);
 }
