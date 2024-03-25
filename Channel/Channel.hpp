@@ -28,7 +28,6 @@ class Channel
 		int getLimit();
 		int	getOnlyInvited();
 
-
 		void	setChannelName(std::string name);
 		void	setChanOps(std::string ops);
 		void	setTopicName(std::string topic);
@@ -37,11 +36,13 @@ class Channel
 		void	setKey(int key);
 		void	setLimit(int limit);
 		void	setOnlyInvited(int onlyInvited);
+		void	setCreatedAt();
 
 		void	removeUser(int fd);
 		void	removeOp(int fd);
 
 		void	sendAll(std::string reply);
+		void	sendAll2(std::string reply, int fd);
 
 		size_t	numClient();
 		void	checkChannelName(std::string channelName);
@@ -55,6 +56,7 @@ class Channel
 		std::string	_chanOps;
 		std::string	_topicname;
 		std::string password;
+		std::string created_at;
 		int	topic;
 		int	key;
 		int	limit;

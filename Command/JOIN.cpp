@@ -27,13 +27,14 @@ void	Server::JOIN(std::string message, int fd)
 		{
 			if (this->channel[j].getChannelName() == param[i].first)
 			{
+				addToExistChannel(param, i, j, fd);
 				flag = true;
 				break;
 			}
-			
 		}
+		if (!flag)
+			addToNewChannel(param, i, fd);
 	}
-	
 }
 
 int	Server::splitJoin(std::vector<std::pair<std::string, std::string> > &param, std::string message, int fd)
@@ -111,7 +112,7 @@ int	Server::splitJoin(std::vector<std::pair<std::string, std::string> > &param, 
 	return (1);
 }
 
-void	Server::addExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd)
+void	Server::addToExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd)
 {
 	// vérifie si le client est déjà enregistré dans le canal
 	if (this->channel[j].getFindUser(getClientFduser(fd)->getNickname()))
@@ -146,11 +147,33 @@ void	Server::addExistChannel(std::vector<std::pair<std::string, std::string> > &
 	User *user = getClientFduser(fd);
 	this->channel[j].addMember(*user);
 	if (channel[j].getTopicName().empty())
-	{
 		sendMessage(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), param[i].first) + \
 			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getChannelList()) + \
 			RPL_ENDOFNAMES(getClientFduser(fd)->getNickname(), channel[j].getChannelName()), fd);
+	else
+		sendMessage(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), param[i].first) + \
+			RPL_TOPIC(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getTopicName()) + \
+			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getChannelList()) + \
+			RPL_ENDOFNAMES(getClientFduser(fd)->getNickname(), channel[j].getChannelName()), fd);
+	channel[j].sendAll2(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), param[i].first), fd);
+}
+
+void	Server::addToNewChannel(std::vector<std::pair<std::string, std::string> >&param, int i, int fd)
+{
+	Channel	newChannel;
+
+	if (countJoinedChannel(getClientFduser(fd)->getNickname()) >= 10)
+	{
+		sendMessage3(405, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :You have joined too many channels\r\n");
+		return ;
 	}
+	newChannel.setChannelName(param[i].first);
+	newChannel.addChanOps(*getClientFduser(fd));
+	newChannel.setCreatedAt();
+	this->channel.push_back(newChannel);
+	sendMessage(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), newChannel.getChannelName()) + \
+			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), newChannel.getChannelName(), newChannel.getChannelList()) + \
+			RPL_ENDOFNAMES(getClientFduser(fd)->getNickname(), newChannel.getChannelName()), fd);
 }
 
 // compter le nombre de canal dont le user est présent

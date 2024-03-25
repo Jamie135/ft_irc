@@ -9,6 +9,7 @@ Channel::Channel()
 	this->_channelName = "";
 	this->_chanOps = "";
 	this->_topicname = "";
+	this->created_at = "";
 	this->topic = 0;
 	this->key = 0;
 	this->limit = 0;
@@ -40,6 +41,7 @@ Channel	&Channel::operator=(Channel const &rhs)
 		this->key = rhs.key;
 		this->limit = rhs.limit;
 		this->onlyInvited = rhs.onlyInvited;
+		this->created_at = rhs.created_at;
 	}
 	return (*this);
 }
@@ -123,10 +125,25 @@ User	*Channel::getFindUser(std::string name)
 	return (NULL);
 }
 
-int Channel::getOnlyInvited(){return this->onlyInvited;}
-int Channel::getTopic(){return this->topic;}
-int Channel::getKey(){return this->key;}
-int Channel::getLimit(){return this->limit;}
+int	Channel::getOnlyInvited()
+{
+	return this->onlyInvited;
+}
+
+int	Channel::getTopic()
+{
+	return this->topic;
+}
+
+int	Channel::getKey()
+{
+	return this->key;
+}
+
+int	Channel::getLimit()
+{
+	return this->limit;
+}
 
 void	Channel::setChannelName(std::string name)
 {
@@ -148,10 +165,33 @@ void	Channel::setChannelPass(std::string password)
 	this->password = password;
 }
 
-void Channel::setOnlyInvited(int onlyInvited){this->onlyInvited = onlyInvited;}
-void Channel::setTopic(int topic){this->topic = topic;}
-void Channel::setKey(int key){this->key = key;}
-void Channel::setLimit(int limit){this->limit = limit;}
+void	Channel::setOnlyInvited(int onlyInvited)
+{
+	this->onlyInvited = onlyInvited;
+}
+
+void	Channel::setTopic(int topic)
+{
+	this->topic = topic;
+}
+
+void	Channel::setKey(int key)
+{
+	this->key = key;
+}
+
+void 	Channel::setLimit(int limit)
+{
+	this->limit = limit;
+}
+
+void	Channel::setCreatedAt()
+{
+	std::time_t _time = std::time(NULL);
+	std::ostringstream	oss;
+	oss << _time;
+	this->created_at = std::string(oss.str());
+}
 
 void	Channel::removeUser(int fd)
 {
@@ -231,6 +271,26 @@ void	Channel::sendAll(std::string reply)
 	{
 		if (send(sockclient[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
 			std::cerr << "send() failed" << std::endl;
+	}
+}
+
+void	Channel::sendAll2(std::string reply, int fd)
+{
+	for (size_t i = 0; i < ops.size(); i++)
+	{
+		if (ops[i].getFduser() != fd)
+		{
+			if (send(ops[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
+				std::cerr << "send() failed" << std::endl;
+		}
+	}
+	for (size_t i = 0; i < sockclient.size(); i++)
+	{
+		if (sockclient[i].getFduser() != fd)
+		{
+			if (send(sockclient[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
+				std::cerr << "send() failed" << std::endl;
+		}
 	}
 }
 

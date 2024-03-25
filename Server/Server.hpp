@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+#include <ctime>
 #include <stdio.h>
 #include <sstream>
 #include <algorithm>
@@ -122,7 +123,9 @@ public:
 
 	void	JOIN(std::string message, int fd);
 	int	splitJoin(std::vector<std::pair<std::string, std::string> > &param, std::string message, int fd);
-	void	addExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd);
+	void	addToExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd);
+	void	addToNewChannel(std::vector<std::pair<std::string, std::string> >&param, int i, int fd);
 	int	countJoinedChannel(std::string user);
 	bool	isInvited(User *user, std::string channel, int flag);
+
 };
