@@ -720,6 +720,8 @@ void	Server::parseCommandList(std::string &message, int fd)
 	{
 		if (command[1] == "JOIN" || command[1] == "join")
 			JOIN(message, fd);
+		else if (command[1] == "INVITE" || command[1] == "invite")
+			INVITE(message, fd);
 	}
 	// else if (!isRegistered(fd))
 	// 	sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);

@@ -1,7 +1,7 @@
 NAME = ircserv
 CPP = c++
 CFLAGS = -Wall -Wextra -Werror
-CPPFLAGS = -std=c++98
+CPPFLAGS = -std=c++98 -g3
 
 SRCS =	main.cpp \
 		Server/Server.cpp \
@@ -14,7 +14,8 @@ SRCS =	main.cpp \
 		Command/USER.cpp \
 		Command/QUIT.cpp \
 		Command/PING.cpp \
-		Command/JOIN.cpp
+		Command/JOIN.cpp \
+		Command/INVITE.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
