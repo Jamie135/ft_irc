@@ -113,9 +113,52 @@ void	Server::removeFd(int fd){
 	}
 }
 
+// parcourir tous les canaux du serveur 
+// et retirer les users de chaque canal
+// puis supprimer le canal vide
+void	Server::clearChannel(int fd)
+{
+	int	flag; // utilisé pour suivre si l'utilisateur a été retiré d'un canal
+	std::string	reply;
+
+	for (size_t i = 0; i < this->channel.size(); i++)
+	{
+		flag = 0;
+		if (channel[i].getUserFd(fd))
+		{
+			channel[i].removeUser(fd);
+			flag = 1;
+		}
+		else if (channel[i].getOpFd(fd))
+		{
+			channel[i].removeOp(fd);
+			flag = 1;
+		}
+		if (channel[i].numClient() == 0)
+		{
+			channel.erase(channel.begin() + i);
+			i--;
+			continue;
+		}
+		if (flag)
+		{
+			reply = ":" + getClientFduser(fd)->getNickname() + "!~" + getClientFduser(fd)->getUser() + "@localhost QUIT Quit\r\n";
+			channel[i].sendAll(reply);
+		}
+	}
+}
+
+// send() permet d'envoyer des données au socket fd, souvent utilisé pour envoyer des messages provenant de l'execution des commandes
 void	Server::sendMessage(std::string message, int fd)
 {
 	std::cout << ">> " << message;
 	if (send(fd, message.c_str(), message.size(), 0) == -1)
 		std::cerr << "send() failed" << std::endl;
+}
+
+bool	Server::isRegistered(int fd)
+{
+	if (!getClientFduser(fd) || getClientFduser(fd)->getNickname().empty() || getClientFduser(fd)->getUser().empty() || getClientFduser(fd)->getNickname() == "*" || !getClientFduser(fd)->getConnected())
+		return (false);
+	return (true);
 }

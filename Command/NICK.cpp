@@ -5,39 +5,39 @@ void	Server::NICK(std::string message, int fd)
 	// std::cout << "NICK\nfd: " << fd << " ; message: " << message << std::endl;
 
 	User	*user;
-	size_t	nonspace;
 	std::string asterisk;
 	std::string	old;
 	
 	user = getClientFduser(fd);
-	message = message.substr(4);
-	nonspace = message.find_first_not_of("\t\v ");
 	asterisk = "*";
-	if (nonspace < message.size())
-	{
-		message = message.substr(nonspace);
-		if (message[0] == ':')
-			message.erase(message.begin());
-	}
-	if (message.empty() || nonspace == std::string::npos)
+
+	// supprimer les espaces et les ':' au début du message
+	std::string::iterator it = message.begin();
+    while (it != message.end() && (*it == ' ' || *it == '\t' || *it == '\v'))
+        ++it;
+    if (it != message.end() && *it == ':')
+        ++it;
+    message = std::string(it + 5, message.end()); // supprimer "PASS " du message
+	if (message.empty())
 		sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), message), fd);
-	if (usedNickname(message) && user->getNickname() != message)
+	if (usedNickname(message) && user->getNickname() != message) // vérifier si le nickname est déjà utilisé et que ce n'est pas celui de l'user actuel
 	{
 		if (user->getNickname().empty())
 			user->setNickname(asterisk);
 		sendMessage(ERR_NICKNAMEINUSE(std::string("*"), message), fd);
 	}
+
 	if (!validNickname(message))
 		sendMessage(ERR_ERRONEUSNICKNAME(std::string("*") ,message), fd);
 	else
 	{
-		if (user && user->getRegistered())
+		if (user && user->getRegistered()) // vérifie si l'user est deja enregistré, si oui on change son nickname
 		{
 			old = user->getNickname();
 			user->setNickname(message);
 			if (!old.empty() && old != message)
 			{
-				if (old == "*" && !user->getUser().empty())
+				if (old == "*" && !user->getUser().empty()) // vérifie si l'user est connecté en tant que user non enregistré
 				{
 					user->setConnected(true);
 					sendMessage(RPL_CONNECTED(user->getNickname()), fd);

@@ -4,18 +4,17 @@
 /* 							CONSTRUCTORS / DESTRUCTORS						  */
 /* ************************************************************************** */
 
-Channel::Channel(std::string channelName, User &founder) : _channelName(channelName),
-	_founder(founder)
+Channel::Channel()
 {
-	checkChannelName(_channelName);
-	_chanOps.push_back(_founder);
-	_members.push_back(_founder);
+	this->_channelName = "";
+	this->_chanOps = "";
+	this->_topic = "";
 }
 
-// Channel::Channel(Channel const &src)
-// {
-// 	*this = src;
-// }
+Channel::Channel(Channel const &src)
+{
+	*this = src;
+}
 
 Channel::~Channel()
 {
@@ -29,6 +28,9 @@ Channel	&Channel::operator=(Channel const &rhs)
 {
 	if (this != &rhs)
 	{
+		this->_channelName = rhs._channelName;
+		this->_chanOps = rhs._chanOps;
+		this->_topic = rhs._topic;
 	}
 	return (*this);
 }
@@ -36,6 +38,100 @@ Channel	&Channel::operator=(Channel const &rhs)
 /* ************************************************************************** */
 /* 								MEMBER FUNCTIONS							  */
 /* ************************************************************************** */
+
+std::string	Channel::getChannelName()
+{
+	return (_channelName);
+}
+
+std::string	Channel::getChanOps()
+{
+	return (_chanOps);
+}
+
+std::string	Channel::getTopic()
+{
+	return (_topic);
+}
+
+User	*Channel::getUserFd(int fd)
+{
+	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		if (it->getFduser() == fd)
+			return &(*it);
+	}
+	return (NULL);
+}
+
+User	*Channel::getOpFd(int fd)
+{
+	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
+	{
+		if (it->getFduser() == fd)
+			return &(*it);
+	}
+	return (NULL);
+}
+
+void	Channel::setChannelName(std::string name)
+{
+	this->_channelName = name;
+}
+
+void	Channel::setChanOps(std::string ops)
+{
+	this->_chanOps = ops;
+}
+
+void	Channel::setTopic(std::string topic)
+{
+	this->_topic = topic;
+}
+
+void	Channel::removeUser(int fd)
+{
+	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		if (it->getFduser() == fd)
+		{
+			sockclient.erase(it);
+			break;
+		}
+	}
+}
+
+void	Channel::removeOp(int fd)
+{
+	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
+	{
+		if (it->getFduser() == fd)
+		{
+			ops.erase(it);
+			break;
+		}
+	}
+}
+
+void	Channel::addMember(User &user)
+{
+	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		if (*it == user)
+			throw std::runtime_error("User is already member of this channel");
+	}
+	sockclient.push_back(user);
+}
+
+void	Channel::addChanOps(User &user)
+{
+	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
+	{
+		if (*it == user)
+			throw std::runtime_error("User is already operator of this channel");
+	}
+	ops.push_back(user);
+}
 
 void	Channel::checkChannelName(std::string channnelName)
 {
@@ -51,51 +147,27 @@ void	Channel::checkChannelName(std::string channnelName)
 	}
 }
 
-void	Channel::addChanOps(User &user)
+size_t	Channel::numClient()
 {
-	for (std::vector<User>::iterator it = _chanOps.begin(); it != _chanOps.end(); ++it)
-	{
-		if (*it == user)
-			throw std::runtime_error("User is already operator of this channel");
-	}
-	_chanOps.push_back(user);
+	size_t	num;
+	
+	num = this->sockclient.size() + this->ops.size();
+	return (num);
 }
 
-void	Channel::removeChanOps(User &user)
+// envoyer un message à tous les users et opérateurs présents dans le canal
+void	Channel::sendAll(std::string reply)
 {
-	for (std::vector<User>::iterator it = _chanOps.begin(); it != _chanOps.end(); ++it)
+	for (size_t i = 0; i < ops.size(); i++)
 	{
-		if (*it == user)
-		{
-			_chanOps.erase(it);
-		}
+		if (send(ops[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
+			std::cerr << "send() failed" << std::endl;
 	}
-}
-
-void	Channel::addMember(User &user)
-{
-	for (std::vector<User>::iterator it = _members.begin(); it != _members.end(); ++it)
+	for (size_t i = 0; i < sockclient.size(); i++)
 	{
-		if (*it == user)
-			throw std::runtime_error("User is already member of this channel");
+		if (send(sockclient[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
+			std::cerr << "send() failed" << std::endl;
 	}
-	_members.push_back(user);
-}
-
-void	Channel::removeMember(User &user)
-{
-	for (std::vector<User>::iterator it = _members.begin(); it != _members.end(); ++it)
-	{
-		if (*it == user)
-		{
-			_members.erase(it);
-		}
-	}
-}
-
-void	Channel::setTopic(std::string topic)
-{
-	_topic = topic;
 }
 
 void	Channel::sendMessage(std::string msg, User &author)
@@ -103,14 +175,3 @@ void	Channel::sendMessage(std::string msg, User &author)
 	(void)msg;
 	(void)author;
 }
-
-std::string	Channel::getChannelName()
-{
-	return (_channelName);
-}
-
-std::string	Channel::getTopic()
-{
-	return (_topic);
-}
-
