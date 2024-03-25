@@ -8,7 +8,11 @@ Channel::Channel()
 {
 	this->_channelName = "";
 	this->_chanOps = "";
-	this->_topic = "";
+	this->_topicname = "";
+	this->topic = 0;
+	this->key = 0;
+	this->limit = 0;
+	this->onlyInvited = 0;
 }
 
 Channel::Channel(Channel const &src)
@@ -30,7 +34,12 @@ Channel	&Channel::operator=(Channel const &rhs)
 	{
 		this->_channelName = rhs._channelName;
 		this->_chanOps = rhs._chanOps;
-		this->_topic = rhs._topic;
+		this->_topicname = rhs._topicname;
+		this->password = rhs.password;
+		this->topic = rhs.topic;
+		this->key = rhs.key;
+		this->limit = rhs.limit;
+		this->onlyInvited = rhs.onlyInvited;
 	}
 	return (*this);
 }
@@ -49,9 +58,34 @@ std::string	Channel::getChanOps()
 	return (_chanOps);
 }
 
-std::string	Channel::getTopic()
+std::string	Channel::getTopicName()
 {
-	return (_topic);
+	return (_topicname);
+}
+
+std::string	Channel::getChannelPass()
+{
+	return (this->password);
+}
+
+std::string Channel::getChannelList()
+{
+	std::string	list;
+	for (size_t i = 0; i < ops.size(); i++)
+	{
+		list += "@" + ops[i].getNickname();
+		if ((i + 1) < ops.size())
+			list += " ";
+	}
+	if (sockclient.size())
+		list += " ";
+	for (size_t i = 0; i < sockclient.size(); i++)
+	{
+		list += sockclient[i].getNickname();
+		if ((i + 1) < sockclient.size())
+			list += " ";
+	}
+	return (list);
 }
 
 User	*Channel::getUserFd(int fd)
@@ -74,6 +108,26 @@ User	*Channel::getOpFd(int fd)
 	return (NULL);
 }
 
+User	*Channel::getFindUser(std::string name)
+{
+	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		if (it->getNickname() == name)
+			return &(*it);
+	}
+	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
+	{
+		if (it->getNickname() == name)
+			return &(*it);
+	}
+	return (NULL);
+}
+
+int Channel::getOnlyInvited(){return this->onlyInvited;}
+int Channel::getTopic(){return this->topic;}
+int Channel::getKey(){return this->key;}
+int Channel::getLimit(){return this->limit;}
+
 void	Channel::setChannelName(std::string name)
 {
 	this->_channelName = name;
@@ -84,10 +138,20 @@ void	Channel::setChanOps(std::string ops)
 	this->_chanOps = ops;
 }
 
-void	Channel::setTopic(std::string topic)
+void	Channel::setTopicName(std::string topic)
 {
-	this->_topic = topic;
+	this->_topicname = topic;
 }
+
+void	Channel::setChannelPass(std::string password)
+{
+	this->password = password;
+}
+
+void Channel::setOnlyInvited(int onlyInvited){this->onlyInvited = onlyInvited;}
+void Channel::setTopic(int topic){this->topic = topic;}
+void Channel::setKey(int key){this->key = key;}
+void Channel::setLimit(int limit){this->limit = limit;}
 
 void	Channel::removeUser(int fd)
 {

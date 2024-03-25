@@ -2,16 +2,38 @@
 
 void	Server::JOIN(std::string message, int fd)
 {
-	std::cout << "JOIN\nfd: " << fd << " ; message: " << message << std::endl;
+	// std::cout << "JOIN\nfd: " << fd << " ; message: " << message << std::endl;
 
 	// param est un vecteur dont chaque indice correspond à une paire de string
 	// le premier string représente le nom du canal
 	// le deuxième string représente la clé associée si elle est spécifié
 	std::vector<std::pair<std::string, std::string> >	param;
+	bool	flag;
+
 	if (!splitJoin(param, message, fd))
 	{
+		sendMessage3(461, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :Not enough parameters\r\n");
 		return ;
 	}
+	if (param.size() > 10)
+	{
+		sendMessage3(407, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :Too many channels\r\n");
+		return ;
+	}
+	for (size_t i = 0; i < param.size(); i++)
+	{
+		flag = false;
+		for (size_t j = 0; j < this->channel.size(); j++)
+		{
+			if (this->channel[j].getChannelName() == param[i].first)
+			{
+				flag = true;
+				break;
+			}
+			
+		}
+	}
+	
 }
 
 int	Server::splitJoin(std::vector<std::pair<std::string, std::string> > &param, std::string message, int fd)
@@ -87,4 +109,70 @@ int	Server::splitJoin(std::vector<std::pair<std::string, std::string> > &param, 
 			param[i].first.erase(param[i].first.begin());
 	}
 	return (1);
+}
+
+void	Server::addExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd)
+{
+	// vérifie si le client est déjà enregistré dans le canal
+	if (this->channel[j].getFindUser(getClientFduser(fd)->getNickname()))
+		return;
+	if (countJoinedChannel(getClientFduser(fd)->getNickname()) >= 10)
+	{
+		sendMessage3(405, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :You have joined too many channels\r\n");
+		return;
+	}
+	if (!this->channel[j].getChannelPass().empty() && this->channel[j].getChannelPass() != param[i].second)
+	{
+		if (!isInvited(getClientFduser(fd), param[i].first, 0))
+		{
+			sendMessage2(475, getClientFduser(fd)->getNickname(), "#" + param[i].first, getClientFduser(fd)->getFduser(), " :Cannot join channel (+k) - bad key\r\n");
+			return ;
+		}
+	}
+	if (this->channel[j].getOnlyInvited())
+	{
+		if (!isInvited(getClientFduser(fd), param[i].first, 1))
+		{
+			sendMessage2(473, getClientFduser(fd)->getNickname(), "#" + param[i].first, getClientFduser(fd)->getFduser(), " :Cannot join channel (+i)\r\n");
+			return ;
+		}
+	}
+	if (this->channel[j].getLimit() && this->channel[j].numClient() >= (size_t)this->channel[j].getLimit())
+	{
+		sendMessage2(471, getClientFduser(fd)->getNickname(), "#" + param[i].first, getClientFduser(fd)->getFduser(), " :Cannot join channel (+l)\r\n");
+		return ;
+	}
+
+	User *user = getClientFduser(fd);
+	this->channel[j].addMember(*user);
+	if (channel[j].getTopicName().empty())
+	{
+		sendMessage(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), param[i].first) + \
+			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getChannelList()) + \
+			RPL_ENDOFNAMES(getClientFduser(fd)->getNickname(), channel[j].getChannelName()), fd);
+	}
+}
+
+// compter le nombre de canal dont le user est présent
+int	Server::countJoinedChannel(std::string user)
+{
+	int	count = 0;
+
+	for (size_t i = 0; i < this->channel.size(); i++)
+	{
+		if (this->channel[i].getFindUser(user))
+			count++;
+	}
+	return (count);
+}
+
+bool	Server::isInvited(User *user, std::string channel, int flag)
+{
+	if (user->getInvited(channel))
+	{
+		if (flag == 1)
+			user->removeInvite(channel);
+		return (true);
+	}
+	return (false);
 }
