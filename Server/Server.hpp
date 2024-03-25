@@ -128,4 +128,8 @@ public:
 	int	countJoinedChannel(std::string user);
 	bool	isInvited(User *user, std::string channel, int flag);
 
+	void	PART(std::string message, int fd);
+	int	splitPart(std::string message, std::vector<std::string> &param, std::string &reason, int fd);
+	std::string	splitPartReason(std::string &message, std::vector<std::string> &param);
+	void	findReason(std::string message, std::string tofind, std::string &reason);
 };

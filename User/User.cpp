@@ -87,6 +87,7 @@ bool    User::getConnected()
     return (this->connected);
 }
 
+// vérifie si le user a été invité à rejoindre le canal
 bool    User::getInvited(std::string &channel)
 {
     for (size_t i = 0; i < this->invitation.size(); i++)
@@ -137,6 +138,7 @@ void    User::removeBuffer()
     buffer.clear();
 }
 
+// retirer l'invitation quand le user invité rejoint le canal
 void    User::removeInvite(std::string &channel)
 {
     for (size_t i = 0; i < this->invitation.size(); i++)

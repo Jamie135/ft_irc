@@ -70,6 +70,7 @@ std::string	Channel::getChannelPass()
 	return (this->password);
 }
 
+// générer une liste des users qui sont membres du canal qui sera envoyée en reply
 std::string Channel::getChannelList()
 {
 	std::string	list;
@@ -110,6 +111,7 @@ User	*Channel::getOpFd(int fd)
 	return (NULL);
 }
 
+// rechercher un user dans sockclient et ops
 User	*Channel::getFindUser(std::string name)
 {
 	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
@@ -185,6 +187,7 @@ void 	Channel::setLimit(int limit)
 	this->limit = limit;
 }
 
+// définir l'heure et stocké dans created_at (utilisée pour quand on crée un canal)
 void	Channel::setCreatedAt()
 {
 	std::time_t _time = std::time(NULL);
@@ -217,23 +220,13 @@ void	Channel::removeOp(int fd)
 	}
 }
 
-void	Channel::addMember(User &user)
+void	Channel::addMember(User user)
 {
-	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
-	{
-		if (*it == user)
-			throw std::runtime_error("User is already member of this channel");
-	}
 	sockclient.push_back(user);
 }
 
-void	Channel::addChanOps(User &user)
+void	Channel::addChanOps(User user)
 {
-	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
-	{
-		if (*it == user)
-			throw std::runtime_error("User is already operator of this channel");
-	}
 	ops.push_back(user);
 }
 
