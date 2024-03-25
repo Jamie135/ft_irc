@@ -73,6 +73,7 @@ public:
 
 	// Send Methods
 	void	sendMessage(std::string message, int fd);
+	void	sendMessage2(int errnum, std::string user, std::string channel, int fd, std::string message);
 
 	// Utils Methods
 	bool	isRegistered(int fd);
@@ -114,4 +115,5 @@ public:
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);
 	void	PING(std::string &message, int fd);
 	void	JOIN(std::string message, int fd);
+	int	splitJoin(std::vector<std::pair<std::string, std::string> > &param, std::string message, int fd);
 };
