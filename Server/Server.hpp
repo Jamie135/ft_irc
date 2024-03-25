@@ -75,7 +75,7 @@ public:
 	void	sendMessage(std::string message, int fd);
 
 	// Utils Methods
-	bool	notRegistered(int fd);
+	bool	isRegistered(int fd);
 
 	// ServerInit Methods
 	void	initServer();
@@ -113,4 +113,5 @@ public:
 	std::string	quitReason(std::string message);
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);
 	void	PING(std::string &message, int fd);
+	void	JOIN(std::string message, int fd);
 };
