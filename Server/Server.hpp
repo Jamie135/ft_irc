@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+#include <ctime>
 #include <stdio.h>
 #include <sstream>
 #include <algorithm>
@@ -73,6 +74,8 @@ public:
 
 	// Send Methods
 	void	sendMessage(std::string message, int fd);
+	void	sendMessage2(int errnum, std::string user, std::string channel, int fd, std::string message);
+	void	sendMessage3(int errnum, std::string user, int fd, std::string message);
 
 	// Utils Methods
 	bool	isRegistered(int fd);
@@ -105,13 +108,24 @@ public:
 
 	// Command Methods
 	void	PASS(std::string message, int fd);
+
 	void	NICK(std::string message, int fd);
 	bool	usedNickname(std::string &nickname);
 	bool	validNickname(std::string &nickname);
+
 	void	USER(std::string &message, int fd);
+
 	void	QUIT(std::string message, int fd);
 	std::string	quitReason(std::string message);
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);
+	
 	void	PING(std::string &message, int fd);
+
 	void	JOIN(std::string message, int fd);
+	int	splitJoin(std::vector<std::pair<std::string, std::string> > &param, std::string message, int fd);
+	void	addToExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd);
+	void	addToNewChannel(std::vector<std::pair<std::string, std::string> >&param, int i, int fd);
+	int	countJoinedChannel(std::string user);
+	bool	isInvited(User *user, std::string channel, int flag);
+
 };

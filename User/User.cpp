@@ -69,6 +69,14 @@ std::string User::getBuffer()
     return (buffer);
 }
 
+std::string User::getHostname()
+{
+    std::string hostname;
+
+    hostname = this->getNickname() + "!" + this->getUser();
+    return (hostname);
+}
+
 bool    User::getRegistered()
 {
     return (registered);
@@ -77,6 +85,16 @@ bool    User::getRegistered()
 bool    User::getConnected()
 {
     return (this->connected);
+}
+
+bool    User::getInvited(std::string &channel)
+{
+    for (size_t i = 0; i < this->invitation.size(); i++)
+    {
+        if (this->invitation[i] == channel)
+            return (true);
+    }
+    return (false);
 }
 
 void    User::setFduser(int fd)
@@ -117,4 +135,16 @@ void    User::setConnected(bool val)
 void    User::removeBuffer()
 {
     buffer.clear();
+}
+
+void    User::removeInvite(std::string &channel)
+{
+    for (size_t i = 0; i < this->invitation.size(); i++)
+    {
+        if (this->invitation[i] == channel)
+        {
+            this->invitation.erase(this->invitation.begin() + i);
+            return ;
+        }
+    }
 }

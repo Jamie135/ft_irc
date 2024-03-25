@@ -15,6 +15,7 @@ private:
 	std::string buffer;
 	bool	registered;
 	bool	connected;
+	std::vector<std::string>	invitation;
 public:
 	User();
 	User(int fd, std::string nickname, std::string user);
@@ -28,8 +29,10 @@ public:
 	std::string	getUser();
 	std::string	getIp();
 	std::string	getBuffer();
+	std::string getHostname();
 	bool	getRegistered();
 	bool	getConnected();
+	bool	getInvited(std::string &channel);
 
 	void	setFduser(int fd);
 	void	setNickname(std::string &nickname);
@@ -40,4 +43,5 @@ public:
 	void	setConnected(bool val);
 
 	void	removeBuffer();
+	void	removeInvite(std::string &channel);
 };

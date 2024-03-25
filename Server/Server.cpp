@@ -156,6 +156,28 @@ void	Server::sendMessage(std::string message, int fd)
 		std::cerr << "send() failed" << std::endl;
 }
 
+void	Server::sendMessage2(int errnum, std::string user, std::string channel, int fd, std::string message)
+{
+	std::stringstream ss;
+	std::string	rep;
+
+	ss << ":localhost " << errnum << " " << user << " " << channel << message;
+	rep = ss.str();
+	if (send(fd, rep.c_str(), rep.size(), 0) == -1)
+		std::cerr << "send() failed" << std::endl;
+}
+
+void	Server::sendMessage3(int errnum, std::string user, int fd, std::string message)
+{
+	std::stringstream ss;
+	std::string	rep;
+
+	ss << ":localhost " << errnum << " " << user << " " << message;
+	rep = ss.str();
+	if (send(fd, rep.c_str(), rep.size(), 0) == -1)
+		std::cerr << "send() failed" << std::endl;
+}
+
 bool	Server::isRegistered(int fd)
 {
 	if (!getClientFduser(fd) || getClientFduser(fd)->getNickname().empty() || getClientFduser(fd)->getUser().empty() || getClientFduser(fd)->getNickname() == "*" || !getClientFduser(fd)->getConnected())
