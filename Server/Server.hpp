@@ -76,6 +76,7 @@ public:
 
 	// Utils Methods
 	bool	isRegistered(int fd);
+	bool	checkChannelExist(std::string channelName);
 
 	// ServerInit Methods
 	void	initServer();
@@ -114,4 +115,5 @@ public:
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);
 	void	PING(std::string &message, int fd);
 	void	JOIN(std::string message, int fd);
+	void	INVITE(std::string message, int fd);
 };

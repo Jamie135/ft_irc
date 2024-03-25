@@ -162,3 +162,13 @@ bool	Server::isRegistered(int fd)
 		return (false);
 	return (true);
 }
+
+bool	Server::checkChannelExist(std::string channelName)
+{
+	for (std::vector<Channel>::iterator it = channel.begin(); it != channel.end(); ++it)
+	{
+		if (it->getChannelName() == channelName)
+			return (true);
+	}
+	return (false);
+}
