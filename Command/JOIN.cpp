@@ -37,6 +37,8 @@ void	Server::JOIN(std::string message, int fd)
 	}
 }
 
+// séparer les paramètres de JOIN dans un vecteur de paires de string param
+// ex: JOIN <channel1>,<channel2> <key1>,<key2> ==> param[0] = <channel1, key1> ; param[1] = <channel2, key2>
 int	Server::splitJoin(std::vector<std::pair<std::string, std::string> > &param, std::string message, int fd)
 {
 	std::vector<std::string>	vec;
@@ -112,16 +114,19 @@ int	Server::splitJoin(std::vector<std::pair<std::string, std::string> > &param, 
 	return (1);
 }
 
+// ajouter un user dans un canal existant
 void	Server::addToExistChannel(std::vector<std::pair<std::string, std::string> > &param, int i , int j, int fd)
 {
 	// vérifie si le client est déjà enregistré dans le canal
 	if (this->channel[j].getFindUser(getClientFduser(fd)->getNickname()))
 		return;
+	// vérifie si le nombre maximal de canaux que le user peut rejoindre est atteint
 	if (countJoinedChannel(getClientFduser(fd)->getNickname()) >= 10)
 	{
 		sendMessage3(405, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :You have joined too many channels\r\n");
 		return;
 	}
+	// vérifie si le canal est protégé par un mot de passe et si le mot de passe fourni est incorrect
 	if (!this->channel[j].getChannelPass().empty() && this->channel[j].getChannelPass() != param[i].second)
 	{
 		if (!isInvited(getClientFduser(fd), param[i].first, 0))
@@ -130,6 +135,7 @@ void	Server::addToExistChannel(std::vector<std::pair<std::string, std::string> >
 			return ;
 		}
 	}
+	// vérifie si le canal est uniquement accessible par invitation et si le user est invité
 	if (this->channel[j].getOnlyInvited())
 	{
 		if (!isInvited(getClientFduser(fd), param[i].first, 1))
@@ -138,14 +144,17 @@ void	Server::addToExistChannel(std::vector<std::pair<std::string, std::string> >
 			return ;
 		}
 	}
+	// vérifie la capacité maximale des canaux est atteint
 	if (this->channel[j].getLimit() && this->channel[j].numClient() >= (size_t)this->channel[j].getLimit())
 	{
 		sendMessage2(471, getClientFduser(fd)->getNickname(), "#" + param[i].first, getClientFduser(fd)->getFduser(), " :Cannot join channel (+l)\r\n");
 		return ;
 	}
 
+	// ajoute le client au canal
 	User *user = getClientFduser(fd);
 	this->channel[j].addMember(*user);
+	// envoie les messages de bienvenue au user
 	if (channel[j].getTopicName().empty())
 		sendMessage(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), param[i].first) + \
 			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getChannelList()) + \
@@ -155,22 +164,28 @@ void	Server::addToExistChannel(std::vector<std::pair<std::string, std::string> >
 			RPL_TOPIC(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getTopicName()) + \
 			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), channel[j].getChannelName(), channel[j].getChannelList()) + \
 			RPL_ENDOFNAMES(getClientFduser(fd)->getNickname(), channel[j].getChannelName()), fd);
+	// envoie un message de bienvenue à tous les membres du canal
 	channel[j].sendAll2(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), param[i].first), fd);
 }
 
+// ajouter un user dans un nouveau canal qu'on va créer
 void	Server::addToNewChannel(std::vector<std::pair<std::string, std::string> >&param, int i, int fd)
 {
 	Channel	newChannel;
 
+	// vérifie si le nombre maximal de canaux que le user peut rejoindre est atteint
 	if (countJoinedChannel(getClientFduser(fd)->getNickname()) >= 10)
 	{
 		sendMessage3(405, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :You have joined too many channels\r\n");
 		return ;
 	}
+
+	// crée un nouveau canal avec le nom spécifié par le user
 	newChannel.setChannelName(param[i].first);
 	newChannel.addChanOps(*getClientFduser(fd));
 	newChannel.setCreatedAt();
 	this->channel.push_back(newChannel);
+	// notifie que le user a rejoint le canal
 	sendMessage(RPL_JOIN(getClientFduser(fd)->getHostname(), getClientFduser(fd)->getIp(), newChannel.getChannelName()) + \
 			RPL_NAMREPLY(getClientFduser(fd)->getNickname(), newChannel.getChannelName(), newChannel.getChannelList()) + \
 			RPL_ENDOFNAMES(getClientFduser(fd)->getNickname(), newChannel.getChannelName()), fd);
@@ -189,11 +204,12 @@ int	Server::countJoinedChannel(std::string user)
 	return (count);
 }
 
+// vérifie si le user a été invité à rejoindre un canal
 bool	Server::isInvited(User *user, std::string channel, int flag)
 {
 	if (user->getInvited(channel))
 	{
-		if (flag == 1)
+		if (flag == 1) // retirer l'invitation de l'user, flag indique si le user a été retiré
 			user->removeInvite(channel);
 		return (true);
 	}

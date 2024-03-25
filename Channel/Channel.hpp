@@ -46,8 +46,8 @@ class Channel
 
 		size_t	numClient();
 		void	checkChannelName(std::string channelName);
-		void	addChanOps(User &user);
-		void	addMember(User &user);
+		void	addChanOps(User user);
+		void	addMember(User user);
 		void	sendMessage(std::string msg, User &author);
 
 	private:
