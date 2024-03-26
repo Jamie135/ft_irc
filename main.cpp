@@ -1,21 +1,8 @@
-#include <iostream>
-#include <cstring>
-#include <cerrno>
-#include <map>
-#include <vector>
-#include <sys/socket.h> // for socket()
-#include <sys/types.h> // for socket()
-#include <netinet/in.h> // for sockaddr_in
-#include <fcntl.h> // for fcntl() in mac
-#include <unistd.h> // for close()
-#include <arpa/inet.h> // for inet_ntoa()
-#include <poll.h> // for poll()
-#include <csignal> // for signal()
 #include "./Server/Server.hpp"
 
 int	main(int argc, char **argv)
 {
-	Server	serv(argv);
+	Server	serv;
 
 	if (argc != 3)
 	{
@@ -26,7 +13,12 @@ int	main(int argc, char **argv)
 	{
 		signal(SIGINT, Server::signalHandler);
 		signal(SIGQUIT, Server::signalHandler);
-		serv.initServer();
+		if (!serv.isValidArg(argv[1]) || !*argv[2] || strlen(argv[2]) > 20)
+		{
+			std::cout << "Error: Invalid port number / password!" << std::endl;
+			return (1);
+		}
+		serv.initServer(atoi(argv[1]), argv[2]);
 		serv.checkPoll();
 	}
 	catch(const std::exception& e)

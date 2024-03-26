@@ -722,6 +722,8 @@ void	Server::parseCommandList(std::string &message, int fd)
 			JOIN(message, fd);
 		else if (command[1] == "PART" || command[1] == "part")
 			PART(message, fd);
+		else if (command[1] == "KICK" || command[1] == "kick")
+			KICK(message, fd);
 	}
 	// else if (!isRegistered(fd))
 	// 	sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);

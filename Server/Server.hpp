@@ -48,7 +48,7 @@ private:
 
 public:
 
-	Server(char **argv);
+	Server();
 	Server(Server const &obj);
 	Server &operator=(Server const &obj);
 	~Server();
@@ -59,12 +59,14 @@ public:
 	std::string	getPassword();
 	User	*getClientFduser(int fd);
 	User	*getClientNickname(std::string nickname);
+	Channel	*getChannel(std::string name);
 
 	// Setters
 	void	setSockfd(int sockfd);
 	void	setPort(int port);
 	void	setPassword(std::string password);
 	void	setClientUser(User newuser);
+	void	setChannel(Channel newchannel);
 	void	setPollfd(pollfd fd);
 
 	// Removers
@@ -78,15 +80,15 @@ public:
 	void	sendMessage3(int errnum, std::string user, int fd, std::string message);
 
 	// Utils Methods
+	void	closeFd();
+	bool	isValidArg(std::string port);
 	bool	isRegistered(int fd);
 
 	// ServerInit Methods
-	void	initServer();
+	void	initServer(int port, std::string pass);
 	void	checkPoll();
 	void	acceptClient();
-	void	acceptUser(int fd, std::string buff);
 	void	receiveEvent(int fd);
-	void	closeFd();
 	static void	signalHandler(int signum);
 
 	// ServerParsing Methods
@@ -131,5 +133,10 @@ public:
 	void	PART(std::string message, int fd);
 	int	splitPart(std::string message, std::vector<std::string> &param, std::string &reason, int fd);
 	std::string	splitPartReason(std::string &message, std::vector<std::string> &param);
-	void	findReason(std::string message, std::string tofind, std::string &reason);
+	void	findPartReason(std::string message, std::string tofind, std::string &reason);
+
+	void	KICK(std::string message, int fd);
+	std::string	splitKick(std::string message, std::vector<std::string> &param, std::string &user, int fd);
+	std::string	splitKickReason(std::string &message, std::vector<std::string> &param);
+	void	findKickReason(std::string message, std::string tofind, std::string &comment);
 };
