@@ -121,7 +121,7 @@ int	Server::splitPart(std::string message, std::vector<std::string> &param, std:
 	return (1);
 }
 
-// divise les paramètres en deux (channel et reason) et les stocke dans param
+// divise les paramètres en deux (channel et reason) et les stock dans param
 // puis on extrait et retourne la raison 
 std::string	Server::splitPartReason(std::string &message, std::vector<std::string> &param)
 {
@@ -135,13 +135,13 @@ std::string	Server::splitPartReason(std::string &message, std::vector<std::strin
 		param.push_back(str);
 	if (param.size() != 2)
 		return (std::string(""));
-	findReason(message, param[1], reason);
+	findPartReason(message, param[1], reason);
 	return (reason);
 }
 
 // trouver la première occurrence de tofind dans message 
 // et stocke tout ce qui se trouve après cette occurrence dans reason
-void	Server::findReason(std::string message, std::string tofind, std::string &reason)
+void	Server::findPartReason(std::string message, std::string tofind, std::string &reason)
 {
 	size_t	i;
 	std::string	str;

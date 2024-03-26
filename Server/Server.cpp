@@ -66,6 +66,16 @@ User	*Server::getClientNickname(std::string nickname)
 	return (NULL);
 }
 
+Channel	*Server::getChannel(std::string name)
+{
+	for (size_t i = 0; i < this->channel.size(); i++)
+	{
+		if (this->channel[i].getChannelName() == name)
+			return (&channel[i]);
+	}
+	return (NULL);
+}
+
 void	Server::setSockfd(int fd)
 {
 	this->sockfd = fd;
@@ -84,6 +94,11 @@ void	Server::setPassword(std::string password)
 void	Server::setClientUser(User newuser)
 {
 	this->sockclient.push_back(newuser);
+}
+
+void	Server::setChannel(Channel newchannel)
+{
+	this->channel.push_back(newchannel);
 }
 
 void	Server::setPollfd(pollfd fd)
@@ -176,6 +191,21 @@ void	Server::sendMessage3(int errnum, std::string user, int fd, std::string mess
 	rep = ss.str();
 	if (send(fd, rep.c_str(), rep.size(), 0) == -1)
 		std::cerr << "send() failed" << std::endl;
+}
+
+// fermer les fd des users et du serveur
+void	Server::closeFd()
+{
+	for (size_t i = 0; i < sockclient.size(); i++)
+	{
+		std::cout << "FD[" << sockfd << "] disconnected" << std::endl;
+		close(sockclient[i].getFduser());
+	}
+	if (sockfd != -1)
+	{
+		std::cout << "Server (FD[" << sockfd << "]) disconnected" << std::endl;
+		close(sockfd);
+	}
 }
 
 bool	Server::isValidArg(std::string arg)

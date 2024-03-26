@@ -139,21 +139,6 @@ void	Server::receiveEvent(int fd)
 	}
 }
 
-// fermer les fd des users et du serveur
-void	Server::closeFd()
-{
-	for (size_t i = 0; i < sockclient.size(); i++)
-	{
-		std::cout << "FD[" << sockfd << "] disconnected" << std::endl;
-		close(sockclient[i].getFduser());
-	}
-	if (sockfd != -1)
-	{
-		std::cout << "Server (FD[" << sockfd << "]) disconnected" << std::endl;
-		close(sockfd);
-	}
-}
-
 // recevoir les signaux CtrlC et Ctrl'\'
 void	Server::signalHandler(int signum)
 {

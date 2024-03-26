@@ -9,6 +9,7 @@ User::User()
     this->buffer = "";
     this->registered = false;
     this->connected = false;
+    this->isOp = false;
 }
 
 User::User(int fd, std::string nickname, std::string user): fdUser(fd), nickname(nickname), user(user)
@@ -30,6 +31,7 @@ User &User::operator=(User const &obj)
         this->buffer = obj.buffer;
         this->registered = obj.registered;
         this->connected = obj.connected;
+        this->isOp = obj.isOp;
     }
     return *this;
 }

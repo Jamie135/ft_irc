@@ -15,6 +15,7 @@ private:
 	std::string buffer;
 	bool	registered;
 	bool	connected;
+	bool	isOp;
 	std::vector<std::string>	invitation;
 public:
 	User();
