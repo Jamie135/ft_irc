@@ -13,7 +13,7 @@ void	Server::PART(std::string message, int fd)
 	}
 	for (size_t i = 0; i < param.size(); i++)
 	{
-		flag = false;
+		flag = false; // indique si le canal est trouvé
 		for (size_t j = 0; j < this->channel.size(); j++)
 		{
 			if (this->channel[j].getChannelName() == param[i])
@@ -24,17 +24,23 @@ void	Server::PART(std::string message, int fd)
 					sendMessage2(442, getClientFduser(fd)->getNickname(), "#" + param[i], getClientFduser(fd)->getFduser(), " :You're not on that channel\r\n");
 					continue;
 				}
+
+				// flux de chaîne pour construire le message de départ du canal
 				std::stringstream	ss;
 				ss << ":" << getClientFduser(fd)->getNickname() << "!~" << getClientFduser(fd)->getUser() << "@localhost PART #" << param[i];
+				// vérifie si on a une raison de départ
 				if (!reason.empty())
 					ss << " :" << reason << "\r\n";
 				else
 					ss << "\r\n";
 				channel[j].sendAll(ss.str());
+
+				// supprimer les cannaux en tant qu'opérateur ou membre
 				if (channel[j].getOpFd(channel[j].getFindUser(getClientFduser(fd)->getNickname())->getFduser()))
 					channel[j].removeOp(channel[j].getFindUser(getClientFduser(fd)->getNickname())->getFduser());
 				else
 					channel[j].removeUser(channel[j].getFindUser(getClientFduser(fd)->getNickname())->getFduser());
+				// si le canal est vide après avoir enlever le client, on supprime le canal
 				if (channel[j].numClient() == 0)
 					channel.erase(channel.begin() + j);
 			}
@@ -44,20 +50,25 @@ void	Server::PART(std::string message, int fd)
 	}
 }
 
+// split la commande PART pour extraire ses paramètres
+// (les noms des cannaux et sa raison de départ)
 int	Server::splitPart(std::string message, std::vector<std::string> &param, std::string &reason, int fd)
 {
 	std::string	str;
 	std::string	tmp;
 
-	tmp = splitPartReason(message, param);
+	reason = splitPartReason(message, param);
 	if (param.size() < 2)
 	{
 		param.clear();
 		return (0);
 	}
-	param.erase(param.begin());
-	str = param[0];
-	param.clear();
+	param.erase(param.begin()); // supprimer la commande PART de param
+	str = param[0]; // associer le nom du cannal à str
+	// std::cout << "str: " << str << std::endl;
+	param.clear(); // clear le vecteur param pour stocker les noms de cannaux
+
+	// ajouter les noms des cannaux délimités par les virgules
 	for (size_t i = 0; i < str.size(); i++)
 	{
 		if (str[i] == ',')
@@ -68,16 +79,23 @@ int	Server::splitPart(std::string message, std::vector<std::string> &param, std:
 		else
 			tmp += str[i];
 	}
-	param.push_back(tmp);
+	param.push_back(tmp); // ajouter le dernier nom de canal
+
+	// si le nom de canal est vide, il est supprimé
+	// et l'indice i est décrémenté pour compenser la suppression
 	for (size_t i = 0; i < param.size(); i++)
 	{
 		if (param[i].empty())
 			param.erase(param.begin() + i--);
 	}
+
+	// sumprimer ':' s'il existe
 	if (reason[0] == ':')
 		reason.erase(reason.begin());
 	else
 	{
+		// parcourt chaque caractère de la raison jusqu'à trouver le premier espace
+		// une fois trouvé, la raison est raccourcie pour contenir uniquement les caractères avant cet espace
 		for (size_t i = 0; i < reason.size(); i++)
 		{
 			if (reason[i] == ' ')
@@ -87,8 +105,11 @@ int	Server::splitPart(std::string message, std::vector<std::string> &param, std:
 			}
 		}
 	}
+
 	for (size_t i = 0; i < param.size(); i++)
 	{
+		// supprime '#' s'il existe, sinon ce signifier que le nom est mal formaté
+		// et on envoie un message d'erreur
 		if (*(param[i].begin()) == '#')
 			param[i].erase(param[i].begin());
 		else
@@ -100,7 +121,8 @@ int	Server::splitPart(std::string message, std::vector<std::string> &param, std:
 	return (1);
 }
 
-// divise la commande en deux mots distincts et stocke les deux premiers mots dans param
+// divise les paramètres en deux (channel et reason) et les stocke dans param
+// puis on extrait et retourne la raison 
 std::string	Server::splitPartReason(std::string &message, std::vector<std::string> &param)
 {
 	int	count;
