@@ -8,9 +8,9 @@ void	Server::OPER(std::string &message, int fd)
 	user = getClientFduser(fd);
 	param = splitParam(message);
 	if (param.size() < 2)
-		sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), user->getNickname()), fd);
-	if (param[2] != password)
-		sendMessage(ERR_PASSWDMISMATCH(std::string("*")), fd);
+		{sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), user->getNickname()), fd); return;}
+	if (param[2] != "42")
+		{sendMessage(ERR_PASSWDMISMATCH(std::string("*")), fd); return;}
 	user->setOp(true);
 	sendMessage(RPL_YOUREOPER(user->getNickname()), fd);
 }
