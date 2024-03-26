@@ -48,7 +48,7 @@ private:
 
 public:
 
-	Server(char **argv);
+	Server();
 	Server(Server const &obj);
 	Server &operator=(Server const &obj);
 	~Server();
@@ -78,10 +78,11 @@ public:
 	void	sendMessage3(int errnum, std::string user, int fd, std::string message);
 
 	// Utils Methods
+	bool	isValidArg(std::string port);
 	bool	isRegistered(int fd);
 
 	// ServerInit Methods
-	void	initServer();
+	void	initServer(int port, std::string pass);
 	void	checkPoll();
 	void	acceptClient();
 	void	acceptUser(int fd, std::string buff);

@@ -1,11 +1,9 @@
 #include "Server.hpp"
 
-Server::Server(char **argv)
+Server::Server()
 {
 	std::cout << "---------- FT_IRC SERVER ----------" << std::endl;
 	this->sockfd = -1;
-	port = atoi(argv[1]);
-	password = argv[2];
 	opt_val = 1;
 	poll_size = 10;
 	max_client = 10;
@@ -29,7 +27,9 @@ Server &Server::operator=(Server const &obj){
 }
 
 Server::~Server()
-{}
+{
+	std::cout << "---------- FT_IRC CLOSED ----------" << std::endl;
+}
 
 int	Server::getSockfd()
 {
@@ -176,6 +176,12 @@ void	Server::sendMessage3(int errnum, std::string user, int fd, std::string mess
 	rep = ss.str();
 	if (send(fd, rep.c_str(), rep.size(), 0) == -1)
 		std::cerr << "send() failed" << std::endl;
+}
+
+bool	Server::isValidArg(std::string arg)
+{
+	return (arg.find_first_not_of("0123456789") == std::string::npos && \
+	atoi(arg.c_str()) >= 1024 && atoi(arg.c_str()) <= 65535);
 }
 
 bool	Server::isRegistered(int fd)

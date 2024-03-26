@@ -2,10 +2,12 @@
 
 bool	Server::signal = false;
 
-void    Server::initServer()
+void    Server::initServer(int port, std::string pass)
 {
     struct sockaddr_in addr;
 
+	this->password = pass;
+	this->port = port;
 	addr.sin_family = AF_INET; // int représentant une famille d'adresse, AF_INET représente une famille IPv4
     addr.sin_addr.s_addr = INADDR_ANY; // structure contenant les adresses IPv4, INADDR_ANY représente n'importe quelles adresses IP
 	addr.sin_port = htons(port); // int de 16-bit de l'ordre des octets représentant le port, qui est convertit à l'ordre des octets du réseau avec htons
