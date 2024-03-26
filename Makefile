@@ -4,16 +4,20 @@ CPP = c++
 CFLAGS = -Wall -Wextra -Werror -g3
 CPPFLAGS = -std=c++98
 
-OBJDIR = .obj
+SRCS =	main.cpp \
+		Server/Server.cpp \
+		Server/ServerInit.cpp \
+		Server/ServerParsing.cpp \
+		User/User.cpp \
+		Channel/Channel.cpp \
+		Command/PASS.cpp \
+		Command/NICK.cpp \
+		Command/USER.cpp \
+		Command/QUIT.cpp \
+		Command/PING.cpp \
+		Command/JOIN.cpp \
+		Command/PART.cpp
 
-SRCSSRV =	Server/main.cpp \
-			Server/Server.cpp \
-			Server/commandParsing.cpp
-
-SRCSCLI	=	Client/cmain.cpp \
-			Client/Client.cpp
-
-SRVOBJS = $(patsubst Server/%.cpp, $(OBJDIR)/%.o, $(SRCSSRV))
 CLIOBJS = $(patsubst Client/%.cpp, $(OBJDIR)/%.o, $(SRCSCLI))
 
 all: $(OBJDIR) $(NAME) $(CLIENT)
