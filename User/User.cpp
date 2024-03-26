@@ -89,6 +89,11 @@ bool    User::getConnected()
     return (this->connected);
 }
 
+bool    User::getOp()
+{
+    return (this->isOp);
+}
+
 // vérifie si le user a été invité à rejoindre le canal
 bool    User::getInvited(std::string &channel)
 {
@@ -133,6 +138,11 @@ void    User::setRegistered(bool val)
 void    User::setConnected(bool val)
 {
     this->connected = val;
+}
+
+void    User::setOp(bool op)
+{
+    this->isOp = op;
 }
 
 void    User::removeBuffer()
