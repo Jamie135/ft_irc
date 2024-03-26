@@ -117,6 +117,8 @@ public:
 
 	void	USER(std::string &message, int fd);
 
+	void	OPER(std::string &message, int fd);
+
 	void	QUIT(std::string message, int fd);
 	std::string	quitReason(std::string message);
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);

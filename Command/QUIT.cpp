@@ -24,7 +24,7 @@ void	Server::QUIT(std::string message, int fd)
 		else if (channel[i].getOpFd(fd))
 		{
 			channel[i].removeOp(fd);
-			if (channel[i].numClient() == 0) // si le channel est vide apres suppression du user, on supprime le channel
+			if (channel[i].numClient() == 0) // si le channel est vide apres suppression de l'operateur, on supprime le channel
 				channel.erase(channel.begin() + i);
 			else
 			{
