@@ -117,8 +117,6 @@ public:
 
 	void	USER(std::string &message, int fd);
 
-	void	OPER(std::string &message, int fd);
-
 	void	QUIT(std::string message, int fd);
 	std::string	quitReason(std::string message);
 	void	quitFormatReason(std::string message, std::string str, std::string &reason);
@@ -141,4 +139,6 @@ public:
 	std::string	splitKick(std::string message, std::vector<std::string> &param, std::string &user, int fd);
 	std::string	splitKickReason(std::string &message, std::vector<std::string> &param);
 	void	findKickReason(std::string message, std::string tofind, std::string &comment);
+
+	void	OPER(std::string &message, int fd);
 };
