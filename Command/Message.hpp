@@ -7,6 +7,7 @@
 #define ERR_ERRONEUSNICKNAME(client, nickname) ("432 <" + client + "> <" + nickname + "> : Erroneus nickname\r\n")
 #define ERR_NOTREGISTERED(nickname) ("451 <" + nickname + "> : You have not registered!\r\n")
 #define ERR_CHANOPRIVSNEEDED(channel) ("482 <" + channel + "> :You're not channel operator\r\n")
+#define ERR_NOTONCHANNEL(channel) ("442 <" + channel + "> :You're not on that channel\r\n")
 
 #define	RPL_PONG "PONG ft_irc localhost\r\n"
 #define	RPL_CONNECTED(nickname) ("001 <" + nickname + "> : Welcome to the ft_irc server!\r\n")

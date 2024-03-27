@@ -315,3 +315,14 @@ bool	Channel::modeIsActive( char m )
 	}
 	return (0);
 }
+
+
+bool	Channel::isUserPresent( std::string const& nickname )
+{
+	for (size_t i = 0; i < sockclient.size(); i++)
+	{
+		if (sockclient[i].getNickname() == nickname)
+			return (1);
+	}
+	return (0);
+}

@@ -52,6 +52,8 @@ class Channel
 
 		bool	isOperator( int fd );
 		bool	modeIsActive( char m );
+		
+		bool	isUserPresent( std::string const &nickname );
 
 	private:
 

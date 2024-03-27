@@ -109,7 +109,6 @@ void	Server::receiveEvent(int fd)
 	int	bytes;
 	std::vector<std::string> command;
 
-	std::cout << "receive Signal()" << std::endl;
 	client = getClientFduser(fd);
 	memset(buf, 0, sizeof(buf));
 	bytes = recv(fd, buf, sizeof(buf) - 1, 0); // recevoir les messages depuis un socket et stock les données correspondantes dans buf
@@ -123,6 +122,7 @@ void	Server::receiveEvent(int fd)
 	}
 	else
 	{
+		std::cout << "receive Signal()" << std::endl;
 		client->setBuffer(buf);
 		// std::cout << "buf:\n" << buf << std::endl;
 		if (client->getBuffer().find_first_of("\r\n") == std::string::npos)

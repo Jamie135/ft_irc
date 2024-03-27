@@ -26,34 +26,51 @@ void Server::TOPIC( std::string message, int fd )
 		Check if a topic is set
 		return the topic "<channel> :<topic>"
 	*/
+	Channel	ch = Channel();
+	// Check if the channel name exists
 	for (size_t i = 0; i < channel.size(); i++)
 	{
 		std::cout << "Channel[" << i << "] == " << channel[i].getChannelName() << std::endl;
-		std::cout << "Channel[" << i << "] == " << channel[i].getChannelName() << std::endl;
 		if (channel[i].getChannelName() == &split_params[0][1])
+			ch = channel[i];
+	}
+
+	if (ch.getChannelName().empty() == 0)
+	{
+		// The channel passed as parameter exists
+		if (ch.isUserPresent(getClientFduser(fd)->getNickname()) == 0)
 		{
-			if (split_params[1].empty() == 1)
-			{
-				sendMessage(RPL_TOPIC(getClientFduser(fd)->getNickname(), channel[i].getChannelName(), channel[i].getTopicName()), fd);
-				break ;
-			}
-			else if (channel[i].modeIsActive('t') == 1 && channel[i].isOperator(fd) == 0)
-			{
-				sendMessage(ERR_CHANOPRIVSNEEDED(channel[i].getChannelName()), fd);
-				return ;
-			}
-			const std::vector<User> cli = sockclient;
-			for (size_t i = 0; i < cli.size(); i++)
-			{
-				// check is the client is banned;
-				/*
-					if (cli[i] == _banlist[j])
-					{
-						ERR_NOTONCHANNEL
-					}
-				*/
-			}
+			sendMessage(ERR_NOTONCHANNEL(ch.getChannelName()), fd);
+			return ;
 		}
+	}
+	else
+	{
+		// The channel passed as parameter does not exists
+	}
+
+	if (split_params[1].empty() == 1)
+	{
+		sendMessage(RPL_TOPIC(getClientFduser(fd)->getNickname(), ch.getChannelName(), ch.getTopicName()), fd);
+		return ;
+	}
+
+
+	if (ch.modeIsActive('t') == 1 && ch.isOperator(fd) == 0)
+	{
+		sendMessage(ERR_CHANOPRIVSNEEDED(ch.getChannelName()), fd);
+		return ;
+	}
+	const std::vector<User> cli = sockclient;
+	for (size_t i = 0; i < cli.size(); i++)
+	{
+		// check is the client is banned;
+		/*
+			if (cli[i] == _banlist[j])
+			{
+				ERR_NOTONCHANNEL
+			}
+		*/
 	}
     return ;
 }
