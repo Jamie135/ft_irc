@@ -52,7 +52,6 @@ class Channel
 
 		bool	isOperator( int fd );
 		bool	modeIsActive( char m );
-		bool	isBanned( std::string )
 
 	private:
 
@@ -68,8 +67,8 @@ class Channel
 
 		std::vector<User>	sockclient;
 		std::vector<User>	ops;
-		std::vector<std::string> _modes;
-		std::vector<std::string>	_bans;
+		std::vector<std::pair<char, bool> > _modes;
+		std::vector<User>	_banlist;
 };
 
 #endif

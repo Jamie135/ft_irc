@@ -15,7 +15,8 @@ SRCS =	main.cpp \
 		Command/QUIT.cpp \
 		Command/PING.cpp \
 		Command/JOIN.cpp \
-		Command/PART.cpp
+		Command/PART.cpp \
+		Command/TOPIC.cpp
 
 OBJDIR = .obj
 OBJS = $(SRCS:.cpp=.o)

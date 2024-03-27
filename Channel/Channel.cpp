@@ -289,6 +289,7 @@ void	Channel::sendAll2(std::string reply, int fd)
 
 void	Channel::sendMessage(std::string msg, User &author)
 {
+	std::cout << "channel:: sendMessage" << std::endl;
 	(void)msg;
 	(void)author;
 }
@@ -305,10 +306,12 @@ bool	Channel::isOperator( int fd )
 
 bool	Channel::modeIsActive( char m )
 {
-	for (size_t i = 0; i < _modes.size(); i++)
+	std::vector<std::pair<char, bool> >::iterator it = _modes.begin();
+	while (it < _modes.end())
 	{
-		if (_modes[i][0] == m)
-			return (1);
+		if (it->first == m)
+			return (it->second);
+		it++;
 	}
 	return (0);
 }
