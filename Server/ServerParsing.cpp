@@ -360,7 +360,7 @@ int	Server::parseInvite( std::string split_mess[3] )
 	return (0);
 }
 
-int	Server::parseTopic( std::string split_mess[3] )
+int	Server::parseTopic( std::string split_mess[3],std::string split_params[3] )
 {
 	std::cout << " T O P I C"  << std::endl;
 	/*
@@ -375,12 +375,6 @@ int	Server::parseTopic( std::string split_mess[3] )
 	if (split_mess[2].empty() == 1)
 	{
 		std::cerr << "Error: parseTopic(): no parameters" << std::endl;
-		return (1);
-	}
-
-	std::string split_params[3] = {std::string(), std::string(), std::string()};
-	if (splitParams(split_mess[2], split_params) == 1)
-	{
 		return (1);
 	}
 
@@ -422,20 +416,6 @@ int	Server::parseTopic( std::string split_mess[3] )
 	{
 		std::cerr << "parseTopic(): invalid parameters.(trail parameter is empty" << std::endl;
 		return (1);
-	}
-	
-	/*
-		check the topic
-		Check if a topic is set
-		return the topic "<channel> :<topic>"
-	*/
-
-	if (split_mess[0].empty() == 0)
-	{
-		/*
-			Check if :sender is on the channel
-			Check if :sender has the needed rights
-		*/
 	}
 	return (0);
 }

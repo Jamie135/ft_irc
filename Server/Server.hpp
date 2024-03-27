@@ -96,7 +96,7 @@ public:
 	int	parseUser( std::string split_mess[3] );
 	int	parseJoin( std::string split_mess[3] );
 	int	parsePrivmsg( std::string split_mess[3] );
-	int	parseTopic( std::string split_mess[3] );
+	int	parseTopic( std::string split_mess[3], std::string split_params[3] );
 	int	parseMode( std::string split_mess[3] );
 	int	parseKick( std::string split_mess[3] );
 	int	parseInvite( std::string split_mess[3] );
@@ -132,4 +132,6 @@ public:
 	int	splitPart(std::string message, std::vector<std::string> &param, std::string &reason, int fd);
 	std::string	splitPartReason(std::string &message, std::vector<std::string> &param);
 	void	findReason(std::string message, std::string tofind, std::string &reason);
+
+	void	TOPIC( std::string message, int fd );
 };

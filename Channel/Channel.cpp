@@ -292,3 +292,23 @@ void	Channel::sendMessage(std::string msg, User &author)
 	(void)msg;
 	(void)author;
 }
+
+bool	Channel::isOperator( int fd )
+{
+	for (size_t i = 0; i < ops.size(); i++)
+	{
+		if (fd == ops[i].getFduser())
+			return (1);
+	}
+	return (0);
+}
+
+bool	Channel::modeIsActive( char m )
+{
+	for (size_t i = 0; i < _modes.size(); i++)
+	{
+		if (_modes[i][0] == m)
+			return (1);
+	}
+	return (0);
+}

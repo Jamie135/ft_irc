@@ -1,7 +1,6 @@
 NAME = ircserv
-CLIENT = client
 CPP = c++
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror
 CPPFLAGS = -std=c++98
 
 SRCS =	main.cpp \
@@ -18,32 +17,24 @@ SRCS =	main.cpp \
 		Command/JOIN.cpp \
 		Command/PART.cpp
 
-CLIOBJS = $(patsubst Client/%.cpp, $(OBJDIR)/%.o, $(SRCSCLI))
+OBJDIR = .obj
+OBJS = $(SRCS:.cpp=.o)
 
-all: $(OBJDIR) $(NAME) $(CLIENT)
+all: $(NAME)
 
-$(NAME): $(SRVOBJS)
-	$(CPP) $(CFLAGS) $(CPPFLAGS) $(SRVOBJS) -o $(NAME)
+$(NAME): $(OBJS)
+	$(CPP) $(VFLAGS) -o $(NAME) $^
+	mkdir -p $(OBJDIR) && mv $(SRCS:.cpp=.o) $(OBJDIR)
 
-$(CLIENT):	$(CLIOBJS)
-	$(CPP) $(CFLAGS) $(CPPFLAGS) $(CLIOBJS) -o $(CLIENT)
-
-$(OBJDIR):
-	mkdir -p .obj
-
-$(OBJDIR)/%.o : Server/%.cpp
-	$(CPP) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(OBJDIR)/%.o : Client/%.cpp
+%.o : %.cpp
 	$(CPP) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR)
-	rm -f $(NAME)
-	rm -f $(CLIENT)
+	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME)
+	rm -rf $(OBJDIR)
 
 re: fclean all
 

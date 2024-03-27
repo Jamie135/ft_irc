@@ -50,6 +50,10 @@ class Channel
 		void	addMember(User user);
 		void	sendMessage(std::string msg, User &author);
 
+		bool	isOperator( int fd );
+		bool	modeIsActive( char m );
+		bool	isBanned( std::string )
+
 	private:
 
 		std::string	_channelName;
@@ -65,6 +69,7 @@ class Channel
 		std::vector<User>	sockclient;
 		std::vector<User>	ops;
 		std::vector<std::string> _modes;
+		std::vector<std::string>	_bans;
 };
 
 #endif
