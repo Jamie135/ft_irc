@@ -20,7 +20,7 @@ void	Server::USER(std::string &message, int fd)
 	else if (user && !user->getUser().empty())
 		{sendMessage(ERR_ALREADYREGISTERED(user->getNickname()), fd); return;}
 	else
-		user->setUser(param[0]);
+		user->setUser(param[1]);
 	if (user && user->getRegistered() && !user->getUser().empty() && !user->getNickname().empty() && user->getNickname() != "*" && !user->getConnected())
 	{
 		user->setConnected(true);

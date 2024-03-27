@@ -8,27 +8,32 @@ void	Server::KICK(std::string message, int fd)
 	Channel	*chan;
 
 	comment = splitKick(message, param, user, fd);
-	if (user.empty())
+	if (user.empty()) // vérifie si le parametre de KICK est vide,
 	{
 		sendMessage3(461, getClientFduser(fd)->getNickname(), getClientFduser(fd)->getFduser(), " :Not enough parameters\r\n");
 		return ;
 	}
-	for (size_t i = 0; i < param.size(); i++)
+	for (size_t i = 0; i < param.size(); i++) // parcourir les cannaux
 	{
-		if (getChannel(param[i]))
+		if (getChannel(param[i])) // si un cannal existe, on vérifie s'il y a un user
 		{
 			chan = getChannel(param[i]);
+
+			// on vérifie si le user recherché est present
 			if (!chan->getUserFd(fd) && !chan->getOpFd(fd))
 			{
 				sendMessage2(442, getClientFduser(fd)->getNickname(), "#" + param[i], getClientFduser(fd)->getFduser(), " :You're not on that channel\r\n");
 				continue;
 			}
-			if (chan->getOpFd(fd))
+			if (chan->getOpFd(fd)) // on vérifie si le user est un operateur de cannal
 			{
+				std::cout << "HERE\n";
 				if (chan->getFindUser(user))
 				{
+					// flux de chaîne pour construire le message de départ du canal
 					std::stringstream	ss;
 					ss << ":" << getClientFduser(fd)->getNickname() << "!~" << getClientFduser(fd)->getUser() << "@localhost PART #" << param[i] << user;
+					// vérifie si on a un commentaire de KICK
 					if (!comment.empty())
 						ss << " :" << comment << "\r\n";
 					else

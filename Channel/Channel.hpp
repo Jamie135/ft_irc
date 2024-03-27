@@ -19,6 +19,7 @@ class Channel
 		std::string	getTopicName();
 		std::string getChannelPass();
 		std::string getChannelList();
+		std::string	getCreatedAt();
 		std::string	getMode();
 		User	*getUserFd(int fd);
 		User	*getOpFd(int fd);

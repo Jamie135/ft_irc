@@ -24,12 +24,12 @@ void	Server::NICK(std::string message, int fd)
 	{
 		if (user->getNickname().empty())
 			user->setNickname(asterisk);
-		sendMessage(ERR_NICKNAMEINUSE(std::string("*"), message), fd);
+		sendMessage(ERR_NICKNAMEINUSE(std::string(message)), fd);
 		return;
 	}
 
 	if (!validNickname(message))
-		{sendMessage(ERR_ERRONEUSNICKNAME(std::string("*") ,message), fd); return;}
+		{sendMessage(ERR_ERRONEUSNICKNAME(std::string(message)), fd); return;}
 	else
 	{
 		if (user && user->getRegistered()) // vérifie si l'user est deja enregistré, si oui on change son nickname

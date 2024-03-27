@@ -716,8 +716,6 @@ void	Server::parseCommandList(std::string &message, int fd)
 		QUIT(message, fd);
 	else if (command[1] == "PING" || command[1] == "ping")
 		PING(message, fd);
-	else if (command[1] == "OPER" || command[1] == "oper")
-		OPER(message, fd);
 	else if (isRegistered(fd))
 	{
 		if (command[1] == "JOIN" || command[1] == "join")
@@ -726,6 +724,8 @@ void	Server::parseCommandList(std::string &message, int fd)
 			PART(message, fd);
 		else if (command[1] == "KICK" || command[1] == "kick")
 			KICK(message, fd);
+		else if (command[1] == "OPER" || command[1] == "oper")
+			OPER(message, fd);
 	}
 	// else if (!isRegistered(fd))
 	// 	sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);

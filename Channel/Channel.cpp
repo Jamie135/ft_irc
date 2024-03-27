@@ -90,6 +90,11 @@ std::string Channel::getChannelList()
 	return (list);
 }
 
+std::string	Channel::getCreatedAt()
+{
+	return (this->created_at);
+}
+
 std::string Channel::getMode()
 {
 	std::string	mode;
