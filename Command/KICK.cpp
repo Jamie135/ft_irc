@@ -27,7 +27,6 @@ void	Server::KICK(std::string message, int fd)
 			}
 			if (chan->getOpFd(fd)) // on vérifie si le user est un operateur de cannal
 			{
-				std::cout << "HERE\n";
 				if (chan->getFindUser(user))
 				{
 					// flux de chaîne pour construire le message de départ du canal
