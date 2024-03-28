@@ -121,8 +121,7 @@ std::string	Server::splitKick(std::string message, std::vector<std::string> &par
 
 	for (size_t i = 0; i < param.size(); i++)
 	{
-		// supprime '#' s'il existe, sinon ce signifier que le nom est mal formaté
-		// et on envoie un message d'erreur
+		// supprime '#' s'il existe, sinon le nom est mal formaté et on envoie un message d'erreur
 		if (*(param[i].begin()) == '#')
 			param[i].erase(param[i].begin());
 		else
