@@ -16,7 +16,7 @@ void	Server::PASS(std::string message, int fd)
     message = std::string(it + 5, message.end()); // supprimer "PASS " du message
 
     if (message.empty())
-        sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), message), fd);
+        sendMessage(ERR_NEEDMOREPARAMS(std::string("*")), fd);
     else if (!user->getRegistered()) 
 	{
         pass = message;

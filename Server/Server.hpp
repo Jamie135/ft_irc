@@ -141,4 +141,8 @@ public:
 	void	findKickReason(std::string message, std::string tofind, std::string &comment);
 
 	void	OPER(std::string &message, int fd);
+
+	void	MODE(std::string &message, int fd);
+	void	parseModeParam(std::string message, std::string &channelname, std::string &modes, std::string &param);
+	std::vector<std::string>	splitModeParam(std::string param);
 };

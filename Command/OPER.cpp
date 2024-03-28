@@ -8,7 +8,7 @@ void	Server::OPER(std::string &message, int fd)
 	user = getClientFduser(fd);
 	param = splitParam(message);
 	if (param.size() < 2)
-		{sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), user->getNickname()), fd); return;}
+		{sendMessage(ERR_NEEDMOREPARAMS(user->getNickname()), fd); return;}
 	if (param[2] != "42") // on suppose que le mot de passe de l'operateur est "42"
 		{sendMessage(ERR_PASSWDMISMATCH(std::string("*")), fd); return;}
 	user->setOp(true);

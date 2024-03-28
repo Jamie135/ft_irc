@@ -726,6 +726,8 @@ void	Server::parseCommandList(std::string &message, int fd)
 			KICK(message, fd);
 		else if (command[1] == "OPER" || command[1] == "oper")
 			OPER(message, fd);
+		else if (command[1] == "MODE" || command[1] == "mode")
+			MODE(message, fd);
 	}
 	// else if (!isRegistered(fd))
 	// 	sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);

@@ -19,7 +19,7 @@ void	Server::NICK(std::string message, int fd)
         ++it;
     message = std::string(it + 5, message.end()); // supprimer "PASS " du message
 	if (message.empty())
-		{sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), message), fd); return;}
+		{sendMessage(ERR_NEEDMOREPARAMS(std::string("*")), fd); return;}
 	if (usedNickname(message) && user->getNickname() != message) // vérifier si le nickname est déjà utilisé et que ce n'est pas celui de l'user actuel
 	{
 		if (user->getNickname().empty())
