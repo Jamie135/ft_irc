@@ -31,7 +31,7 @@ void	Server::KICK(std::string message, int fd)
 				{
 					// flux de chaîne pour construire le message de départ du canal
 					std::stringstream	ss;
-					ss << ":" << getClientFduser(fd)->getNickname() << "!~" << getClientFduser(fd)->getUser() << "@localhost PART #" << param[i] << user;
+					ss << ":" << getClientFduser(fd)->getNickname() << "!~" << getClientFduser(fd)->getUser() << "@localhost KICK #" << param[i] << " " << user;
 					// vérifie si on a un commentaire de KICK
 					if (!comment.empty())
 						ss << " :" << comment << "\r\n";
