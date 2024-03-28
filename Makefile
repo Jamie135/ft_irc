@@ -18,14 +18,14 @@ SRCS =	main.cpp \
 		Command/PART.cpp \
 		Command/TOPIC.cpp
 
-OBJDIR = .obj
+# OBJDIR = .obj
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	$(CPP) $(VFLAGS) -o $(NAME) $^
-	mkdir -p $(OBJDIR) && mv $(SRCS:.cpp=.o) $(OBJDIR)
+	# mkdir -p $(OBJDIR) && mv $(SRCS:.cpp=.o) $(OBJDIR)
 
 %.o : %.cpp
 	$(CPP) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

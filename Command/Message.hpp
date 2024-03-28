@@ -16,3 +16,4 @@
 #define RPL_NAMREPLY(nickname, channelname, clientslist) (": 353 " + nickname + " @ #" + channelname + " :" + clientslist + "\r\n")
 #define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list\r\n")
 #define RPL_TOPIC(nickname, channelname, topic) (": 332 " + nickname + " #" + channelname + " :" + topic + "\r\n")
+#define RPL_NOTOPIC(channel) (": 331 <" + channel + "> :No topic is set.\r\n")
