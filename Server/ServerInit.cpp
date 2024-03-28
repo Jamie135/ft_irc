@@ -2,10 +2,12 @@
 
 bool	Server::signal = false;
 
-void    Server::initServer()
+void    Server::initServer(int port, std::string pass)
 {
     struct sockaddr_in addr;
 
+	this->password = pass;
+	this->port = port;
 	addr.sin_family = AF_INET; // int représentant une famille d'adresse, AF_INET représente une famille IPv4
     addr.sin_addr.s_addr = INADDR_ANY; // structure contenant les adresses IPv4, INADDR_ANY représente n'importe quelles adresses IP
 	addr.sin_port = htons(port); // int de 16-bit de l'ordre des octets représentant le port, qui est convertit à l'ordre des octets du réseau avec htons
@@ -135,21 +137,6 @@ void	Server::receiveEvent(int fd)
 		}
 		if (getClientFduser(fd)) // supprimer le buffer s'il existe toujours un user
 			getClientFduser(fd)->removeBuffer();
-	}
-}
-
-// fermer les fd des users et du serveur
-void	Server::closeFd()
-{
-	for (size_t i = 0; i < sockclient.size(); i++)
-	{
-		std::cout << "FD[" << sockfd << "] disconnected" << std::endl;
-		close(sockclient[i].getFduser());
-	}
-	if (sockfd != -1)
-	{
-		std::cout << "Server (FD[" << sockfd << "]) disconnected" << std::endl;
-		close(sockfd);
 	}
 }
 

@@ -10,10 +10,10 @@
 #define ERR_NOTONCHANNEL(channel) ("442 <" + channel + "> :You're not on that channel\r\n")
 
 #define	RPL_PONG "PONG ft_irc localhost\r\n"
-#define	RPL_CONNECTED(nickname) ("001 <" + nickname + "> : Welcome to the ft_irc server!\r\n")
-#define RPL_CHANGENICK(old, nickname) (":" + old + " changed to " + nickname + "\r\n")
+#define	RPL_CONNECTED(nickname) ("001 " + nickname + " : Welcome to the ft_irc server!\r\n")
+#define RPL_CHANGENICK(old, nickname) (":" + old + " NICK " + nickname + "\r\n")
 #define RPL_JOIN(hostname, ipaddress, channelname) (":" + hostname + "@" + ipaddress + " JOIN #" + channelname + "\r\n")
 #define RPL_NAMREPLY(nickname, channelname, clientslist) (": 353 " + nickname + " @ #" + channelname + " :" + clientslist + "\r\n")
 #define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list\r\n")
-#define RPL_TOPIC(nickname, channelname, topic) (": 332 " + nickname + " #" + channelname + " :" + topic + "\r\n")
+#define RPL_TOPIC(nickname, channelname, topic) (": 332 " + nickname + " #" +channelname + " :" + topic + "\r\n")
 #define RPL_NOTOPIC(channel) (": 331 <" + channel + "> :No topic is set.\r\n")

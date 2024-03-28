@@ -9,6 +9,7 @@ User::User()
     this->buffer = "";
     this->registered = false;
     this->connected = false;
+    this->isOp = false;
 }
 
 User::User(int fd, std::string nickname, std::string user): fdUser(fd), nickname(nickname), user(user)
@@ -30,6 +31,7 @@ User &User::operator=(User const &obj)
         this->buffer = obj.buffer;
         this->registered = obj.registered;
         this->connected = obj.connected;
+        this->isOp = obj.isOp;
     }
     return *this;
 }
@@ -87,6 +89,11 @@ bool    User::getConnected()
     return (this->connected);
 }
 
+bool    User::getOp()
+{
+    return (this->isOp);
+}
+
 // vérifie si le user a été invité à rejoindre le canal
 bool    User::getInvited(std::string &channel)
 {
@@ -131,6 +138,11 @@ void    User::setRegistered(bool val)
 void    User::setConnected(bool val)
 {
     this->connected = val;
+}
+
+void    User::setOp(bool op)
+{
+    this->isOp = op;
 }
 
 void    User::removeBuffer()

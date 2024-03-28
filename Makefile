@@ -12,10 +12,13 @@ SRCS =	main.cpp \
 		Command/PASS.cpp \
 		Command/NICK.cpp \
 		Command/USER.cpp \
+		Command/OPER.cpp \
 		Command/QUIT.cpp \
 		Command/PING.cpp \
 		Command/JOIN.cpp \
 		Command/PART.cpp \
+		Command/KICK.cpp \
+		Command/MODE.cpp \
 		Command/TOPIC.cpp
 
 # OBJDIR = .obj

@@ -7,13 +7,15 @@
 Channel::Channel()
 {
 	this->_channelName = "";
-	this->_chanOps = "";
 	this->_topicname = "";
 	this->created_at = "";
 	this->topic = 0;
 	this->key = 0;
 	this->limit = 0;
 	this->onlyInvited = 0;
+	char	mode[5] = {'i', 't', 'k', 'o', 'l'};
+	for (int i = 0; i < 5; i++)
+		_modes.push_back(std::make_pair(mode[i], false));
 }
 
 Channel::Channel(Channel const &src)
@@ -34,14 +36,16 @@ Channel	&Channel::operator=(Channel const &rhs)
 	if (this != &rhs)
 	{
 		this->_channelName = rhs._channelName;
-		this->_chanOps = rhs._chanOps;
 		this->_topicname = rhs._topicname;
 		this->password = rhs.password;
 		this->topic = rhs.topic;
 		this->key = rhs.key;
 		this->limit = rhs.limit;
+		this->sockclient = rhs.sockclient;
+		this->ops = rhs.ops;
 		this->onlyInvited = rhs.onlyInvited;
 		this->created_at = rhs.created_at;
+		this->_modes = rhs._modes;
 	}
 	return (*this);
 }
@@ -53,11 +57,6 @@ Channel	&Channel::operator=(Channel const &rhs)
 std::string	Channel::getChannelName()
 {
 	return (_channelName);
-}
-
-std::string	Channel::getChanOps()
-{
-	return (_chanOps);
 }
 
 std::string	Channel::getTopicName()
@@ -89,6 +88,24 @@ std::string Channel::getChannelList()
 			list += " ";
 	}
 	return (list);
+}
+
+std::string	Channel::getCreatedAt()
+{
+	return (this->created_at);
+}
+
+std::string Channel::getMode()
+{
+	std::string	mode;
+	for (size_t i = 0; i < _modes.size(); i++)
+	{
+		if (_modes[i].first != 'o' && _modes[i].second)
+			mode.push_back(_modes[i].first);
+	}
+	if (!mode.empty())
+		mode.insert(mode.begin(), '+');
+	return (mode);
 }
 
 User	*Channel::getUserFd(int fd)
@@ -147,14 +164,14 @@ int	Channel::getLimit()
 	return this->limit;
 }
 
+bool	Channel::getModeOption(size_t i)
+{
+	return (_modes[i].second);
+}
+
 void	Channel::setChannelName(std::string name)
 {
 	this->_channelName = name;
-}
-
-void	Channel::setChanOps(std::string ops)
-{
-	this->_chanOps = ops;
 }
 
 void	Channel::setTopicName(std::string topic)
@@ -185,6 +202,11 @@ void	Channel::setKey(int key)
 void 	Channel::setLimit(int limit)
 {
 	this->limit = limit;
+}
+
+void	Channel::setMode(size_t i, bool mode)
+{
+	_modes[i].second = mode;
 }
 
 // définir l'heure et stocké dans created_at (utilisée pour quand on crée un canal)
@@ -252,6 +274,19 @@ size_t	Channel::numClient()
 	return (num);
 }
 
+bool	Channel::isUserPresent(std::string &name)
+{
+	for(size_t i = 0; i < sockclient.size(); i++){
+		if(sockclient[i].getNickname() == name)
+			return true;
+	}
+	for(size_t i = 0; i < ops.size(); i++){
+		if(ops[i].getNickname() == name)
+			return true;
+	}
+	return false;
+}
+
 // envoyer un message à tous les users et opérateurs présents dans le canal
 void	Channel::sendAll(std::string reply)
 {
@@ -285,6 +320,36 @@ void	Channel::sendAll2(std::string reply, int fd)
 				std::cerr << "send() failed" << std::endl;
 		}
 	}
+}
+
+bool	Channel::userToOp(std::string& name)
+{
+	size_t i = 0;
+	for(; i < sockclient.size(); i++){
+		if(sockclient[i].getNickname() == name)
+			break;
+	}
+	if(i < sockclient.size()){
+		ops.push_back(sockclient[i]);
+		sockclient.erase(i + sockclient.begin());
+		return true;
+	}
+	return false;
+}
+
+bool	Channel::opToUser(std::string& name)
+{
+	size_t i = 0;
+	for(; i < ops.size(); i++){
+		if(ops[i].getNickname() == name)
+			break;
+	}
+	if(i < ops.size()){
+		sockclient.push_back(ops[i]);
+		ops.erase(i + ops.begin());
+		return true;
+	}
+	return false;
 }
 
 void	Channel::sendMessage(std::string msg, User &author)
