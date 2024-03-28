@@ -66,7 +66,7 @@ void	Server::MODE_CHANNEL(std::string &message, int fd)
 		}
 	}
 	std::string	chain = ssmode.str();
-	std::cout << "CHAIN: " << chain << std::endl;
+	// std::cout << "CHAIN: " << chain << std::endl;
 	if (chain.empty())
 		return ;
 	chan->sendAll(RPL_CHANGEMODE(user->getHostname(), chan->getChannelName(), ssmode.str(), arg));
