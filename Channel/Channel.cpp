@@ -7,8 +7,15 @@
 Channel::Channel()
 {
 	this->_channelName = "";
-	this->_chanOps = "";
-	this->_topic = "";
+	this->_topicname = "";
+	this->created_at = "";
+	this->topic = 0;
+	this->key = 0;
+	this->limit = 0;
+	this->onlyInvited = 0;
+	char	mode[5] = {'i', 't', 'k', 'o', 'l'};
+	for (int i = 0; i < 5; i++)
+		_modes.push_back(std::make_pair(mode[i], false));
 }
 
 Channel::Channel(Channel const &src)
@@ -29,8 +36,16 @@ Channel	&Channel::operator=(Channel const &rhs)
 	if (this != &rhs)
 	{
 		this->_channelName = rhs._channelName;
-		this->_chanOps = rhs._chanOps;
-		this->_topic = rhs._topic;
+		this->_topicname = rhs._topicname;
+		this->password = rhs.password;
+		this->topic = rhs.topic;
+		this->key = rhs.key;
+		this->limit = rhs.limit;
+		this->sockclient = rhs.sockclient;
+		this->ops = rhs.ops;
+		this->onlyInvited = rhs.onlyInvited;
+		this->created_at = rhs.created_at;
+		this->_modes = rhs._modes;
 	}
 	return (*this);
 }
@@ -44,14 +59,53 @@ std::string	Channel::getChannelName()
 	return (_channelName);
 }
 
-std::string	Channel::getChanOps()
+std::string	Channel::getTopicName()
 {
-	return (_chanOps);
+	return (_topicname);
 }
 
-std::string	Channel::getTopic()
+std::string	Channel::getChannelPass()
 {
-	return (_topic);
+	return (this->password);
+}
+
+// générer une liste des users qui sont membres du canal qui sera envoyée en reply
+std::string Channel::getChannelList()
+{
+	std::string	list;
+	for (size_t i = 0; i < ops.size(); i++)
+	{
+		list += "@" + ops[i].getNickname();
+		if ((i + 1) < ops.size())
+			list += " ";
+	}
+	if (sockclient.size())
+		list += " ";
+	for (size_t i = 0; i < sockclient.size(); i++)
+	{
+		list += sockclient[i].getNickname();
+		if ((i + 1) < sockclient.size())
+			list += " ";
+	}
+	return (list);
+}
+
+std::string	Channel::getCreatedAt()
+{
+	return (this->created_at);
+}
+
+std::string Channel::getMode()
+{
+	std::string	mode;
+	for (size_t i = 0; i < _modes.size(); i++)
+	{
+		if (_modes[i].first != 'o' && _modes[i].second)
+			mode.push_back(_modes[i].first);
+	}
+	if (!mode.empty())
+		mode.insert(mode.begin(), '+');
+	return (mode);
 }
 
 User	*Channel::getUserFd(int fd)
@@ -74,19 +128,94 @@ User	*Channel::getOpFd(int fd)
 	return (NULL);
 }
 
+// rechercher un user dans sockclient et ops
+User	*Channel::getFindUser(std::string name)
+{
+	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
+	{
+		if (it->getNickname() == name)
+			return &(*it);
+	}
+	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
+	{
+		if (it->getNickname() == name)
+			return &(*it);
+	}
+	return (NULL);
+}
+
+int	Channel::getOnlyInvited()
+{
+	return this->onlyInvited;
+}
+
+int	Channel::getTopic()
+{
+	return this->topic;
+}
+
+int	Channel::getKey()
+{
+	return this->key;
+}
+
+int	Channel::getLimit()
+{
+	return this->limit;
+}
+
+bool	Channel::getModeOption(size_t i)
+{
+	return (_modes[i].second);
+}
+
 void	Channel::setChannelName(std::string name)
 {
 	this->_channelName = name;
 }
 
-void	Channel::setChanOps(std::string ops)
+void	Channel::setTopicName(std::string topic)
 {
-	this->_chanOps = ops;
+	this->_topicname = topic;
 }
 
-void	Channel::setTopic(std::string topic)
+void	Channel::setChannelPass(std::string password)
 {
-	this->_topic = topic;
+	this->password = password;
+}
+
+void	Channel::setOnlyInvited(int onlyInvited)
+{
+	this->onlyInvited = onlyInvited;
+}
+
+void	Channel::setTopic(int topic)
+{
+	this->topic = topic;
+}
+
+void	Channel::setKey(int key)
+{
+	this->key = key;
+}
+
+void 	Channel::setLimit(int limit)
+{
+	this->limit = limit;
+}
+
+void	Channel::setMode(size_t i, bool mode)
+{
+	_modes[i].second = mode;
+}
+
+// définir l'heure et stocké dans created_at (utilisée pour quand on crée un canal)
+void	Channel::setCreatedAt()
+{
+	std::time_t _time = std::time(NULL);
+	std::ostringstream	oss;
+	oss << _time;
+	this->created_at = std::string(oss.str());
 }
 
 void	Channel::removeUser(int fd)
@@ -113,23 +242,13 @@ void	Channel::removeOp(int fd)
 	}
 }
 
-void	Channel::addMember(User &user)
+void	Channel::addMember(User user)
 {
-	for (std::vector<User>::iterator it = sockclient.begin(); it != sockclient.end(); ++it)
-	{
-		if (*it == user)
-			throw std::runtime_error("User is already member of this channel");
-	}
 	sockclient.push_back(user);
 }
 
-void	Channel::addChanOps(User &user)
+void	Channel::addChanOps(User user)
 {
-	for (std::vector<User>::iterator it = ops.begin(); it != ops.end(); ++it)
-	{
-		if (*it == user)
-			throw std::runtime_error("User is already operator of this channel");
-	}
 	ops.push_back(user);
 }
 
@@ -155,6 +274,19 @@ size_t	Channel::numClient()
 	return (num);
 }
 
+bool	Channel::isUserPresent(std::string &name)
+{
+	for(size_t i = 0; i < sockclient.size(); i++){
+		if(sockclient[i].getNickname() == name)
+			return true;
+	}
+	for(size_t i = 0; i < ops.size(); i++){
+		if(ops[i].getNickname() == name)
+			return true;
+	}
+	return false;
+}
+
 // envoyer un message à tous les users et opérateurs présents dans le canal
 void	Channel::sendAll(std::string reply)
 {
@@ -168,6 +300,56 @@ void	Channel::sendAll(std::string reply)
 		if (send(sockclient[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
 			std::cerr << "send() failed" << std::endl;
 	}
+}
+
+void	Channel::sendAll2(std::string reply, int fd)
+{
+	for (size_t i = 0; i < ops.size(); i++)
+	{
+		if (ops[i].getFduser() != fd)
+		{
+			if (send(ops[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
+				std::cerr << "send() failed" << std::endl;
+		}
+	}
+	for (size_t i = 0; i < sockclient.size(); i++)
+	{
+		if (sockclient[i].getFduser() != fd)
+		{
+			if (send(sockclient[i].getFduser(), reply.c_str(), reply.size(), 0) == -1)
+				std::cerr << "send() failed" << std::endl;
+		}
+	}
+}
+
+bool	Channel::userToOp(std::string& name)
+{
+	size_t i = 0;
+	for(; i < sockclient.size(); i++){
+		if(sockclient[i].getNickname() == name)
+			break;
+	}
+	if(i < sockclient.size()){
+		ops.push_back(sockclient[i]);
+		sockclient.erase(i + sockclient.begin());
+		return true;
+	}
+	return false;
+}
+
+bool	Channel::opToUser(std::string& name)
+{
+	size_t i = 0;
+	for(; i < ops.size(); i++){
+		if(ops[i].getNickname() == name)
+			break;
+	}
+	if(i < ops.size()){
+		sockclient.push_back(ops[i]);
+		ops.erase(i + ops.begin());
+		return true;
+	}
+	return false;
 }
 
 void	Channel::sendMessage(std::string msg, User &author)

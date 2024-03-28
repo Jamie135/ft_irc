@@ -9,6 +9,7 @@ User::User()
     this->buffer = "";
     this->registered = false;
     this->connected = false;
+    this->isOp = false;
 }
 
 User::User(int fd, std::string nickname, std::string user): fdUser(fd), nickname(nickname), user(user)
@@ -30,6 +31,7 @@ User &User::operator=(User const &obj)
         this->buffer = obj.buffer;
         this->registered = obj.registered;
         this->connected = obj.connected;
+        this->isOp = obj.isOp;
     }
     return *this;
 }
@@ -69,6 +71,14 @@ std::string User::getBuffer()
     return (buffer);
 }
 
+std::string User::getHostname()
+{
+    std::string hostname;
+
+    hostname = this->getNickname() + "!" + this->getUser();
+    return (hostname);
+}
+
 bool    User::getRegistered()
 {
     return (registered);
@@ -77,6 +87,22 @@ bool    User::getRegistered()
 bool    User::getConnected()
 {
     return (this->connected);
+}
+
+bool    User::getOp()
+{
+    return (this->isOp);
+}
+
+// vérifie si le user a été invité à rejoindre le canal
+bool    User::getInvited(std::string &channel)
+{
+    for (size_t i = 0; i < this->invitation.size(); i++)
+    {
+        if (this->invitation[i] == channel)
+            return (true);
+    }
+    return (false);
 }
 
 void    User::setFduser(int fd)
@@ -114,7 +140,25 @@ void    User::setConnected(bool val)
     this->connected = val;
 }
 
+void    User::setOp(bool op)
+{
+    this->isOp = op;
+}
+
 void    User::removeBuffer()
 {
     buffer.clear();
+}
+
+// retirer l'invitation quand le user invité rejoint le canal
+void    User::removeInvite(std::string &channel)
+{
+    for (size_t i = 0; i < this->invitation.size(); i++)
+    {
+        if (this->invitation[i] == channel)
+        {
+            this->invitation.erase(this->invitation.begin() + i);
+            return ;
+        }
+    }
 }

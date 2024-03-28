@@ -19,16 +19,17 @@ void	Server::NICK(std::string message, int fd)
         ++it;
     message = std::string(it + 5, message.end()); // supprimer "PASS " du message
 	if (message.empty())
-		sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), message), fd);
+		{sendMessage(ERR_NEEDMOREPARAMS(std::string("*"), message), fd); return;}
 	if (usedNickname(message) && user->getNickname() != message) // vérifier si le nickname est déjà utilisé et que ce n'est pas celui de l'user actuel
 	{
 		if (user->getNickname().empty())
 			user->setNickname(asterisk);
-		sendMessage(ERR_NICKNAMEINUSE(std::string("*"), message), fd);
+		sendMessage(ERR_NICKNAMEINUSE(std::string(message)), fd);
+		return;
 	}
 
 	if (!validNickname(message))
-		sendMessage(ERR_ERRONEUSNICKNAME(std::string("*") ,message), fd);
+		{sendMessage(ERR_ERRONEUSNICKNAME(std::string(message)), fd); return;}
 	else
 	{
 		if (user && user->getRegistered()) // vérifie si l'user est deja enregistré, si oui on change son nickname
@@ -45,6 +46,7 @@ void	Server::NICK(std::string message, int fd)
 				}
 				else
 					sendMessage(RPL_CHANGENICK(old, message), fd);
+				return;
 			}
 		}
 		else if (user && !user->getRegistered())
