@@ -2,17 +2,22 @@
 
 #define ERR_NEEDMOREPARAMS(client) (": 461 " + client + " :Not enough parameters\r\n")
 #define	ERR_PASSWDMISMATCH(client) (": 464 " + client + " :Password incorrect\r\n")
-#define	ERR_ALREADYREGISTERED(nickname) (": 462 " + nickname + " :You may not reregister\r\n")
-#define ERR_NICKNAMEINUSE(nickname) (": 433 " + nickname + " :Nickname is already in use\r\n")
-#define ERR_ERRONEUSNICKNAME(nickname) (": 432 " + nickname + " :Erroneus nickname\r\n")
-#define ERR_NOTREGISTERED(nickname) (": 451 " + nickname + " :You have not registered!\r\n")
-#define	ERR_NOSUCHCHANNEL(nickname, channelname) (": 403 " + nickname + " " + channelname + " :No such channel\r\n")
+#define	ERR_ALREADYREGISTERED(client) (": 462 " + client + " :You may not reregister\r\n")
+#define ERR_NICKNAMEINUSE(client) (": 433 " + client + " :Nickname is already in use\r\n")
+#define ERR_ERRONEUSNICKNAME(client) (": 432 " + client + " :Erroneus nickname\r\n")
+#define ERR_NOTREGISTERED(client) (": 451 " + client + " :You have not registered!\r\n")
+#define	ERR_NOSUCHCHANNEL(client, channel) (": 403 " + client + " " + channel + " :No such channel\r\n")
+#define	ERR_CHANOPRIVSNEEDED(channel) (": 482 #" + channel + " :You're not a channel operator\r\n")
+#define	ERR_UNKNOWNMODE(nickname, channel, mode) ": 472 " + nickname + " #" + channel + " " + mode + " :is not a recognised channel mode\r\n"
 
 #define	RPL_PONG "PONG ft_irc localhost\r\n"
-#define	RPL_CONNECTED(nickname) (": 001 " + nickname + " : Welcome to the ft_irc server!\r\n")
-#define RPL_CHANGENICK(old, nickname) (":" + old + " NICK " + nickname + "\r\n")
-#define RPL_JOIN(hostname, ipaddress, channelname) (":" + hostname + "@" + ipaddress + " JOIN #" + channelname + "\r\n")
-#define RPL_NAMREPLY(nickname, channelname, clientslist) (": 353 " + nickname + " @ #" + channelname + " :" + clientslist + "\r\n")
-#define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list\r\n")
-#define RPL_TOPIC(nickname, channelname, topic) (": 332 " + nickname + " #" + channelname + " :" + topic + "\r\n")
-#define	RPL_YOUREOPER(nickname) (nickname + ": You are now an IRC operator\r\n")
+#define	RPL_CONNECTED(client) (": 001 " + client + " : Welcome to the ft_irc server!\r\n")
+#define RPL_CHANGENICK(old, client) (":" + old + " NICK " + client + "\r\n")
+#define RPL_JOIN(hostname, ipaddress, channel) (":" + hostname + "@" + ipaddress + " JOIN #" + channel + "\r\n")
+#define RPL_NAMREPLY(client, channel, clientslist) (": 353 " + client + " @ #" + channel + " :" + clientslist + "\r\n")
+#define RPL_ENDOFNAMES(client, channel) (": 366 " + client + " #" + channel + " :END of /NAMES list\r\n")
+#define RPL_TOPIC(client, channel, topic) (": 332 " + client + " #" + channel + " :" + topic + "\r\n")
+#define	RPL_YOUREOPER(client) (client + ": You are now an IRC operator\r\n")
+#define	RPL_CHANNELMODEIS(client, channel, mode) ": 324 " + client + " #" + channel + " " + mode + "\r\n"
+#define RPL_CREATIONTIME(client, channel, createdat) ": 329 " + client + " #" + channel + " " + createdat + "\r\n"
+#define	RPL_CHANGEMODE(hostname, channel, mode, arguments) (":" + hostname + " MODE #" + channel + " " + mode + " " + arguments + "\r\n")

@@ -142,7 +142,15 @@ public:
 
 	void	OPER(std::string &message, int fd);
 
-	void	MODE(std::string &message, int fd);
-	void	parseModeParam(std::string message, std::string &channelname, std::string &modes, std::string &param);
-	std::vector<std::string>	splitModeParam(std::string param);
+	void	MODE_CHANNEL(std::string &message, int fd);
+	void	parseModeChan(std::string message, std::string &channelname, std::string &modestring, std::string &param);
+	std::vector<std::string>	splitModeChan(std::string param);
+	std::string	modeChanAppend(std::string ssmode, char addminus, char mode);
+	std::string	modeInviteOnly(Channel *channel, char addminus, std::string ssmode);
+
+	void	MODE_USER(std::string &message, int fd);
+	void	parseModeUser(std::string message, std::string &nickname, std::string &modestring, std::string &param);
+	std::vector<std::string>	splitModeUser(std::string param);
+	std::string	modeUserAppend(std::string ssmode, char addminus, char mode);
+	std::string	modeInvisible(char addminus, std::string ssmode);
 };

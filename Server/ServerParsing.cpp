@@ -698,13 +698,15 @@ void	Server::parseCommandList(std::string &message, int fd)
 	// std::cout << "fd: " << fd << " ; message: " << message << std::endl;
 
 	std::vector<std::string>	command;
+	std::vector<std::string>	cmd;
 
 	if (message.empty())
 		return ;
 	command = parseMessage(message);
-	// for(size_t i = 0; i < command.size(); i++)
+	cmd = splitParam(message);
+	// for(size_t i = 0; i < cmd.size(); i++)
 	// {
-	// 	std::cout << "command[" << i << "]: " << command[i] << std::endl;
+	// 	std::cout << "cmd[" << i << "]: " << cmd[i] << std::endl;
 	// }
 	if (command[1] == "PASS" || command[1] == "pass")
 		PASS(message, fd);
@@ -726,8 +728,10 @@ void	Server::parseCommandList(std::string &message, int fd)
 			KICK(message, fd);
 		else if (command[1] == "OPER" || command[1] == "oper")
 			OPER(message, fd);
-		else if (command[1] == "MODE" || command[1] == "mode")
-			MODE(message, fd);
+		else if ((command[1] == "MODE" || command[1] == "mode") && cmd[1] != getClientFduser(fd)->getNickname())
+			MODE_CHANNEL(message, fd);
+		else if ((command[1] == "MODE" || command[1] == "mode") && cmd[1] == getClientFduser(fd)->getNickname())
+			MODE_USER(message, fd);
 	}
 	// else if (!isRegistered(fd))
 	// 	sendMessage(ERR_NOTREGISTERED(std::string("*")), fd);

@@ -18,7 +18,8 @@ SRCS =	main.cpp \
 		Command/JOIN.cpp \
 		Command/PART.cpp \
 		Command/KICK.cpp \
-		Command/MODE.cpp
+		Command/MODE_USER.cpp \
+		Command/MODE_CHANNEL.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

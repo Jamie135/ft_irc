@@ -182,6 +182,7 @@ void	Server::addToNewChannel(std::vector<std::pair<std::string, std::string> >&p
 
 	// crée un nouveau canal avec le nom spécifié par le user
 	newChannel.setChannelName(param[i].first);
+	// std::cout << "Channel name: " << newChannel.getChannelName() << std::endl;
 	newChannel.addChanOps(*getClientFduser(fd));
 	newChannel.setCreatedAt();
 	this->channel.push_back(newChannel);
